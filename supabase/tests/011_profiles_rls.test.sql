@@ -17,7 +17,9 @@ set local role anon;
 select set_config('request.jwt.claims', '', true);
 
 select results_eq(
-  'select username from public.profiles order by username',
+  $$select username from public.profiles
+    where user_id in ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000000b')
+    order by username$$,
   $$values ('alice'::text), ('bob'::text)$$,
   'anon can read public and private profile cards'
 );

@@ -8,11 +8,12 @@ Last updated: 2026-11-17
 
 Done when: a user can register, sign in and edit their profile; and the correct album ranks first for ≥ 90% of test searches, or the spike recommends a secondary search source.
 
-- [x] Project scaffold: pnpm monorepo, Next.js + Tailwind in `apps/web`, local Supabase, Supabase clients and session refresh, pgTAP test harness, lint/typecheck (branch `chore/scaffold`, not merged yet)
-- [ ] Auth: sign-up and sign-in pages, route protection in `apps/web/proxy.ts`
-- [ ] Profile: `profiles` table, created on sign-up, with an edit-profile page
-- [ ] App schema (open question: profiles only for now, or every §6 app table?)
-- [ ] RLS on every user-owned table, with cross-user access tests
+- [x] Project scaffold: pnpm monorepo, Next.js + Tailwind in `apps/web`, local Supabase, Supabase clients and session refresh, pgTAP test harness, lint/typecheck
+- [x] Auth: email/password sign-up (with username), email confirmation, sign-in, sign-out, password reset; `/settings` and `/reset-password` require a session (branch `feat/profiles-auth`, not merged yet)
+- [x] Profile: `profiles` table created on sign-up, `update_profile()` RPC, edit-profile page, public `/u/[username]` page with private toggle (branch `feat/profiles-auth`, not merged yet)
+- [ ] Avatar upload: Storage bucket, per-user policies, size/type limits, upload UI (deferred from the profile task)
+- [x] App schema for Phase 1: `profiles` only. The other §6 app tables arrive with the phases that use them (decided 2026-11-17).
+- [x] RLS on every user-owned table, with cross-user access tests (so far just `profiles`; `can_view_user_content()` is ready for the collection and diary tables)
 - [ ] `catalog` schema (artists, albums, album_artists, mbid_redirects)
 - [ ] Import a slice of the MusicBrainz dump (one-off script; check the current dump format and license first)
 - [ ] `search_albums(q, lim)` with a trigram index
@@ -49,6 +50,10 @@ Done when: a repeat album appears several times in the diary but once in the col
 - [ ] Filters
 - [ ] Edit and delete listens
 - [ ] Remove an album
+
+## Before launch (carried from earlier phases)
+
+- [ ] Hosted Supabase: email confirmation on, minimum password length 8, the `supabase/templates/` email templates, site URL and redirect URLs (see `docs/decisions.md`)
 
 ## Phase 5: Polish & launch (not started)
 
