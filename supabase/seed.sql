@@ -1,0 +1,2 @@
+-- Local development seed data. Runs after migrations on `pnpm db:reset`.
+-- Intentionally empty until the app schema exists.

@@ -33,14 +33,18 @@ Letterboxd-style album diary. The full spec is in `docs/prd.md`. Read the releva
 
 ## Commands
 
-(Fill these in once the scaffold exists.)
+Run from the repo root. The Supabase CLI is a devDependency, so call it as `pnpm supabase …`, not bare `supabase`.
 
-- Start local database: `supabase start`
-- Reset database and apply migrations: `supabase db reset`
-- SQL tests: `supabase test db`
-- Generate types: `supabase gen types typescript --local > packages/types/database.ts`
-- Web dev server:
-- Lint / typecheck / unit tests:
+- Start / stop local database: `pnpm db:start` / `pnpm db:stop` (needs Docker)
+- Reset database and apply migrations: `pnpm db:reset`
+- SQL tests (pgTAP, `supabase/tests`): `pnpm db:test`
+- Generate types: `pnpm db:types` (writes `packages/types/database.ts`)
+- Web dev server: `pnpm dev`
+- Lint / typecheck: `pnpm lint` / `pnpm typecheck` (all workspaces)
+- Everything before saying a task is done: `pnpm check`
+- Unit tests: no runner yet; one gets added with the first TS module that has logic (see `docs/decisions.md`).
+
+Next.js is v16: auth session refresh is in `apps/web/proxy.ts` (formerly `middleware.ts`), and the Next docs live in `apps/web/node_modules/next/dist/docs/` (see `apps/web/AGENTS.md`, which `next dev` maintains).
 
 ## How to work
 
@@ -48,3 +52,4 @@ Letterboxd-style album diary. The full spec is in `docs/prd.md`. Read the releva
 - If the PRD is ambiguous or seems wrong, ask instead of guessing, and note open decisions in `docs/decisions.md`.
 - Don't add dependencies without saying why.
 - Don't rely on memory for external API limits or terms; check the current docs.
+- Create docs/progress.md tracking each PRD phase as a checklist. Update it at the end of every task.
