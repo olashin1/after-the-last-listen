@@ -52,3 +52,4 @@ Next.js is v16: auth session refresh is in `apps/web/proxy.ts` (formerly `middle
 - If the PRD is ambiguous or seems wrong, ask instead of guessing, and note open decisions in `docs/decisions.md`.
 - Don't add dependencies without saying why.
 - Don't rely on memory for external API limits or terms; check the current docs.
+- Create docs/progress.md tracking each PRD phase as a checklist. Update it at the end of every task.
