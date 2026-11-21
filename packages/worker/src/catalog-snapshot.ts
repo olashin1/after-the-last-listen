@@ -10,10 +10,9 @@
 import { spawn } from "node:child_process";
 import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { connect } from "./db.ts";
+import { REPO_ROOT } from "./paths.ts";
 
-const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const SNAPSHOT_DIR = path.join(REPO_ROOT, ".cache", "catalog");
 const SNAPSHOT = path.join(SNAPSHOT_DIR, "catalog.dump");
 const META = path.join(SNAPSHOT_DIR, "catalog.json");

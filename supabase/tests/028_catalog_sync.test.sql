@@ -2,7 +2,7 @@
 -- column and get_album's merged_into_id.
 -- Fixtures use invented names and fake MBIDs so the tests pass on an empty or a full catalog.
 begin;
-select plan(37);
+select plan(38);
 
 -- Structure and access ---------------------------------------------------------------------------
 select has_table('catalog', 'sync_runs', 'catalog.sync_runs exists');
@@ -10,6 +10,10 @@ select has_table('catalog', 'sync_vanished', 'catalog.sync_vanished exists');
 select has_table('catalog', 'live_searches', 'catalog.live_searches exists');
 select col_default_is('catalog', 'albums', 'source', 'dump'::text, 'albums.source defaults to dump');
 select has_column('catalog', 'albums', 'merged_into_id', 'albums.merged_into_id exists');
+select ok(
+  (select condeferrable and condeferred from pg_constraint where conname = 'albums_merged_into_id_fkey'),
+  'merged_into_id is checked at commit, so a data-only restore can load rows in any order'
+);
 
 select table_privs_are('catalog', 'sync_runs', 'anon', array[]::text[], 'anon: no access to sync_runs');
 select table_privs_are('catalog', 'sync_runs', 'authenticated', array[]::text[], 'authenticated: no access to sync_runs');

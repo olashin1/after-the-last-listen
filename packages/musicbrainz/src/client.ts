@@ -8,7 +8,7 @@
 // Each process creates its own client, so each has its own queue. Several server instances (e.g.
 // serverless) don't share a limit; revisit before deploying (docs/decisions.md).
 
-import { mapReleaseTracks, type ReleaseTrack } from "./map.ts";
+import { mapReleaseTracks, type ReleaseTrack } from "./tracks.ts";
 
 const API = "https://musicbrainz.org/ws/2";
 // Contact URL decided with the user (2026-11-21): the project's public GitHub page.
