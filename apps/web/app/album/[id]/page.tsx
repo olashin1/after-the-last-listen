@@ -1,0 +1,91 @@
+import { notFound } from "next/navigation";
+import { Suspense } from "react";
+import { AlbumCover } from "@/components/album-cover";
+import { getAlbumPage } from "@/lib/album";
+import { formatDuration } from "@/lib/musicbrainz-map";
+
+// Album page (PRD Phase 2 "find and inspect an album"): cover, title, then the canonical release's
+// tracklist from the first track to the last. Logging (Phase 3) will be added here.
+
+function parseId(raw: string): number | null {
+  return /^\d{1,18}$/.test(raw) ? Number(raw) : null;
+}
+
+async function Album({ params }: { params: PageProps<"/album/[id]">["params"] }) {
+  const id = parseId((await params).id);
+  if (id === null) notFound();
+  const page = await getAlbumPage(id);
+  if (!page) notFound();
+  const { album, tracks, status } = page;
+
+  const types = [album.primary_type, ...album.secondary_types].join(" · ");
+  const year = album.first_release_date?.slice(0, 4);
+  const discs = new Set(tracks.map((t) => t.disc_number)).size;
+  const totalMs = tracks.every((t) => t.length_ms !== null) ? tracks.reduce((sum, t) => sum + (t.length_ms ?? 0), 0) : null;
+
+  return (
+    <article className="flex flex-col gap-8">
+      <header className="flex flex-col items-center gap-4 text-center">
+        <AlbumCover mbid={album.mbid} title={album.title} size={320} source={500} priority />
+        <div className="flex flex-col gap-1">
+          <h1 className="text-3xl font-semibold tracking-tight break-words">{album.title}</h1>
+          <p className="text-lg text-zinc-600 dark:text-zinc-400 break-words">{album.artist_credit || "Unknown artist"}</p>
+          <p className="text-sm text-zinc-500">
+            {[year, types, tracks.length ? `${tracks.length} tracks` : null, formatDuration(totalMs) || null]
+              .filter(Boolean)
+              .join(" · ")}
+          </p>
+        </div>
+      </header>
+
+      <section aria-labelledby="tracklist-heading" className="flex flex-col gap-2">
+        <h2 id="tracklist-heading" className="sr-only">Tracklist</h2>
+        {status === "no_release" && (
+          <p className="text-sm text-zinc-500">No tracklist for this album yet.</p>
+        )}
+        {status === "unavailable" && (
+          <p className="text-sm text-zinc-500">We couldn&apos;t load the tracklist from MusicBrainz. Try again in a moment.</p>
+        )}
+        {tracks.length > 0 && (
+          <ol className="flex flex-col">
+            {tracks.map((t, i) => {
+              const newDisc = discs > 1 && (i === 0 || tracks[i - 1]!.disc_number !== t.disc_number);
+              return (
+                <li key={`${t.disc_number}-${t.position}`} className="flex flex-col">
+                  {newDisc && (
+                    <span className="mt-4 mb-1 text-xs font-medium uppercase tracking-wide text-zinc-500 first:mt-0">
+                      Disc {t.disc_number}
+                    </span>
+                  )}
+                  <span className="flex items-baseline gap-3 border-b border-zinc-200 py-2 dark:border-zinc-800">
+                    <span className="w-6 shrink-0 text-right text-sm text-zinc-400 tabular-nums">{t.position}</span>
+                    <span className="min-w-0 flex-1 break-words">{t.title}</span>
+                    <span className="shrink-0 text-sm text-zinc-500 tabular-nums">{formatDuration(t.length_ms)}</span>
+                  </span>
+                </li>
+              );
+            })}
+          </ol>
+        )}
+      </section>
+
+      {album.retired && (
+        <p className="text-sm text-zinc-500">This album was removed from MusicBrainz. It&apos;s kept here for anyone who logged it.</p>
+      )}
+      <p className="text-xs text-zinc-400">
+        Album data from <a href={`https://musicbrainz.org/release-group/${album.mbid}`} className="underline">MusicBrainz</a>
+        {" "}· cover from the <a href="https://coverartarchive.org/" className="underline">Cover Art Archive</a>
+      </p>
+    </article>
+  );
+}
+
+export default function AlbumPage(props: PageProps<"/album/[id]">) {
+  return (
+    <main className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 px-4 py-12">
+      <Suspense fallback={<p className="text-sm text-zinc-500">Loading album…</p>}>
+        <Album params={props.params} />
+      </Suspense>
+    </main>
+  );
+}

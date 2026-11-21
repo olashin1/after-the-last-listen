@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { signOut } from "@/app/(auth)/actions";
 import { Avatar } from "@/components/avatar";
+import { debugToolsEnabled } from "@/lib/debug";
 import { getCurrentProfile } from "@/lib/auth";
 
 async function AccountLinks() {
@@ -36,6 +37,9 @@ export function SiteHeader() {
       <nav className="mx-auto flex w-full max-w-4xl items-center justify-between gap-4 px-4 py-3 text-sm">
         <Link href="/" className="font-semibold">After the Last Listen</Link>
         <div className="flex items-center gap-4">
+          {debugToolsEnabled() && (
+            <Link href="/search" title="Debug search page (DEBUG_TOOLS=true)">Search (debug)</Link>
+          )}
           <Suspense fallback={null}>
             <AccountLinks />
           </Suspense>

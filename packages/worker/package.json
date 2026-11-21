@@ -4,10 +4,18 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "catalog:import": "node --env-file-if-exists=.env.local --experimental-strip-types --no-warnings=ExperimentalWarning src/import-release-groups.ts",
+    "search:eval": "node --env-file-if-exists=.env.local --experimental-strip-types --no-warnings=ExperimentalWarning src/search-eval.ts",
+    "catalog:canonical": "node --env-file-if-exists=.env.local --experimental-strip-types --no-warnings=ExperimentalWarning src/import-canonical.ts"
+  },
+  "dependencies": {
+    "postgres": "3.4.9"
   },
   "devDependencies": {
     "@types/node": "^22",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "5.1.0"
   }
 }

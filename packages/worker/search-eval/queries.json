@@ -1,0 +1,362 @@
+[
+  {
+    "query": "OK Computer",
+    "expected": "OK Computer — Radiohead",
+    "expected_mbid": "b1392450-e666-3926-a536-22c65f834433",
+    "category": "exact",
+    "author": "claude"
+  },
+  {
+    "query": "The Dark Side of the Moon",
+    "expected": "The Dark Side of the Moon — Pink Floyd",
+    "expected_mbid": "f5093c06-23e3-404f-aeaa-40f72885ee3a",
+    "category": "exact",
+    "author": "claude"
+  },
+  {
+    "query": "dark side of the moon",
+    "expected": "The Dark Side of the Moon — Pink Floyd",
+    "expected_mbid": "f5093c06-23e3-404f-aeaa-40f72885ee3a",
+    "category": "no-the",
+    "author": "claude"
+  },
+  {
+    "query": "dark sid of the mon",
+    "expected": "The Dark Side of the Moon — Pink Floyd",
+    "expected_mbid": "f5093c06-23e3-404f-aeaa-40f72885ee3a",
+    "category": "typo",
+    "author": "claude"
+  },
+  {
+    "query": "nevermnd",
+    "expected": "Nevermind — Nirvana",
+    "expected_mbid": "1b022e01-4da6-387b-8658-8678046e4cef",
+    "category": "typo",
+    "author": "claude"
+  },
+  {
+    "query": "kendrick lamar to pimp a butterfly",
+    "expected": "To Pimp a Butterfly — Kendrick Lamar",
+    "expected_mbid": "d9103c72-3807-4378-9ce7-b6f3e8fdd547",
+    "category": "artist+title",
+    "author": "claude"
+  },
+  {
+    "query": "rumours fleetwood mac",
+    "expected": "Rumours — Fleetwood Mac",
+    "expected_mbid": "416bb5e5-c7d1-3977-8fd7-7c9daf6c2be6",
+    "category": "title+artist",
+    "author": "claude"
+  },
+  {
+    "query": "sgt pepper",
+    "expected": "Sgt. Pepper’s Lonely Hearts Club Band — The Beatles",
+    "expected_mbid": "9f7a4c28-8fa2-3113-929c-c47a9f7982c3",
+    "category": "partial",
+    "author": "claude"
+  },
+  {
+    "query": "sgt peppers lonely hearts club band",
+    "expected": "Sgt. Pepper’s Lonely Hearts Club Band — The Beatles",
+    "expected_mbid": "9f7a4c28-8fa2-3113-929c-c47a9f7982c3",
+    "category": "punctuation",
+    "author": "claude"
+  },
+  {
+    "query": "homogenic",
+    "expected": "Homogenic — Björk",
+    "expected_mbid": "810272e0-aef1-3d85-b2d3-e512e87fc38c",
+    "category": "accents",
+    "author": "claude"
+  },
+  {
+    "query": "agaetis byrjun",
+    "expected": "Ágætis byrjun — Sigur Rós",
+    "expected_mbid": "62b427b8-1c52-34e7-b250-da2aa3e44860",
+    "category": "accents",
+    "author": "claude"
+  },
+  {
+    "query": "weezer",
+    "expected": "Weezer (1994, the Blue Album) — Weezer",
+    "expected_mbid": "c7b245c9-8099-32ea-af95-893acedde2cf",
+    "category": "self-titled",
+    "author": "claude",
+    "note": "Weezer has several self-titled albums"
+  },
+  {
+    "query": "blue joni mitchell",
+    "expected": "Blue — Joni Mitchell",
+    "expected_mbid": "42d725fb-a8b7-388c-8866-3b02789af326",
+    "category": "common-title",
+    "author": "claude"
+  },
+  {
+    "query": "greatest hits queen",
+    "expected": "Greatest Hits — Queen",
+    "expected_mbid": "69ce61c8-127f-3809-95d8-62fdf3ae1347",
+    "category": "common-title",
+    "author": "claude",
+    "note": "Expected is the 1981 compilation; Queen has later albums with the same title"
+  },
+  {
+    "query": "unplugged in new york",
+    "expected": "MTV Unplugged in New York — Nirvana",
+    "expected_mbid": "fb3770f6-83fb-32b7-85c4-1f522a92287e",
+    "category": "live",
+    "author": "claude",
+    "note": "Expected album is live, so the studio boost works against it"
+  },
+  {
+    "query": "thriller",
+    "expected": "Thriller — Michael Jackson",
+    "expected_mbid": "f32fab67-77dd-3937-addc-9062e28e4c37",
+    "category": "common-title",
+    "author": "claude",
+    "note": "Many tributes and same-named albums"
+  },
+  {
+    "query": "my dear melancholy",
+    "expected": "My Dear Melancholy, — The Weeknd",
+    "expected_mbid": "286591d4-ade8-4d24-a804-7024a9b565a4",
+    "category": "ep",
+    "author": "claude"
+  },
+  {
+    "query": "mayhem lady gaga",
+    "expected": "Mayhem — Lady Gaga",
+    "expected_mbid": "4174e53c-90e8-4630-993f-1f7466178398",
+    "category": "recent",
+    "author": "claude",
+    "note": "2025"
+  },
+  {
+    "query": "debi tirar mas fotos",
+    "expected": "DeBÍ TiRAR MáS FOToS — Bad Bunny",
+    "expected_mbid": "b3073a10-2d7c-484c-b387-e49ae629da3d",
+    "category": "recent",
+    "author": "claude",
+    "note": "2025; odd capitalization and accents"
+  },
+  {
+    "query": "the life of a showgirl",
+    "expected": "The Life of a Showgirl — Taylor Swift",
+    "expected_mbid": "9ae7e7e9-ac40-4874-bd43-d77a9bb9b617",
+    "category": "recent",
+    "author": "claude",
+    "note": "2025"
+  },
+  {
+    "query": "in the aeroplane over the sea",
+    "expected": "In the Aeroplane Over the Sea — Neutral Milk Hotel",
+    "expected_mbid": "8f310800-045b-3e12-8268-50b3d33a2267",
+    "category": "long-title",
+    "author": "claude"
+  },
+  {
+    "query": "1989 taylor swift",
+    "expected": "1989 — Taylor Swift",
+    "expected_mbid": "4d9ec1c2-58ec-48a4-aa0a-916718adead0",
+    "category": "numbers",
+    "author": "claude",
+    "note": "Also has a 2023 re-recording"
+  },
+  {
+    "query": "radiohead kid a",
+    "expected": "Kid A — Radiohead",
+    "expected_mbid": "e75c0549-ad55-39e3-8025-c72c5d4a3c5d",
+    "category": "artist+title",
+    "author": "claude"
+  },
+  {
+    "query": "mbdtf",
+    "expected": "My Beautiful Dark Twisted Fantasy — Kanye West",
+    "expected_mbid": "5d6e21e1-deb5-428e-bb42-c2a567f3619b",
+    "category": "abbreviation",
+    "author": "claude",
+    "note": "Trigram search cannot expand abbreviations. MusicBrainz has two release groups for this album; expected is the one with more links (9 vs 3)"
+  },
+  {
+    "query": "divide ed sheeran",
+    "expected": "÷ — Ed Sheeran",
+    "expected_mbid": "e05f9927-e24b-41c5-928d-d0e008a12444",
+    "category": "symbol",
+    "author": "claude",
+    "note": "The title is the ÷ symbol"
+  },
+  {
+    "query": "",
+    "expected": "",
+    "expected_mbid": null,
+    "category": "real",
+    "author": "user"
+  },
+  {
+    "query": "",
+    "expected": "",
+    "expected_mbid": null,
+    "category": "real",
+    "author": "user"
+  },
+  {
+    "query": "",
+    "expected": "",
+    "expected_mbid": null,
+    "category": "real",
+    "author": "user"
+  },
+  {
+    "query": "",
+    "expected": "",
+    "expected_mbid": null,
+    "category": "real",
+    "author": "user"
+  },
+  {
+    "query": "",
+    "expected": "",
+    "expected_mbid": null,
+    "category": "real",
+    "author": "user"
+  },
+  {
+    "query": "",
+    "expected": "",
+    "expected_mbid": null,
+    "category": "real",
+    "author": "user"
+  },
+  {
+    "query": "",
+    "expected": "",
+    "expected_mbid": null,
+    "category": "real",
+    "author": "user"
+  },
+  {
+    "query": "",
+    "expected": "",
+    "expected_mbid": null,
+    "category": "real",
+    "author": "user"
+  },
+  {
+    "query": "",
+    "expected": "",
+    "expected_mbid": null,
+    "category": "real",
+    "author": "user"
+  },
+  {
+    "query": "",
+    "expected": "",
+    "expected_mbid": null,
+    "category": "real",
+    "author": "user"
+  },
+  {
+    "query": "",
+    "expected": "",
+    "expected_mbid": null,
+    "category": "real",
+    "author": "user"
+  },
+  {
+    "query": "",
+    "expected": "",
+    "expected_mbid": null,
+    "category": "real",
+    "author": "user"
+  },
+  {
+    "query": "",
+    "expected": "",
+    "expected_mbid": null,
+    "category": "real",
+    "author": "user"
+  },
+  {
+    "query": "",
+    "expected": "",
+    "expected_mbid": null,
+    "category": "real",
+    "author": "user"
+  },
+  {
+    "query": "",
+    "expected": "",
+    "expected_mbid": null,
+    "category": "real",
+    "author": "user"
+  },
+  {
+    "query": "",
+    "expected": "",
+    "expected_mbid": null,
+    "category": "real",
+    "author": "user"
+  },
+  {
+    "query": "",
+    "expected": "",
+    "expected_mbid": null,
+    "category": "real",
+    "author": "user"
+  },
+  {
+    "query": "",
+    "expected": "",
+    "expected_mbid": null,
+    "category": "real",
+    "author": "user"
+  },
+  {
+    "query": "",
+    "expected": "",
+    "expected_mbid": null,
+    "category": "real",
+    "author": "user"
+  },
+  {
+    "query": "",
+    "expected": "",
+    "expected_mbid": null,
+    "category": "real",
+    "author": "user"
+  },
+  {
+    "query": "",
+    "expected": "",
+    "expected_mbid": null,
+    "category": "real",
+    "author": "user"
+  },
+  {
+    "query": "",
+    "expected": "",
+    "expected_mbid": null,
+    "category": "real",
+    "author": "user"
+  },
+  {
+    "query": "",
+    "expected": "",
+    "expected_mbid": null,
+    "category": "real",
+    "author": "user"
+  },
+  {
+    "query": "",
+    "expected": "",
+    "expected_mbid": null,
+    "category": "real",
+    "author": "user"
+  },
+  {
+    "query": "",
+    "expected": "",
+    "expected_mbid": null,
+    "category": "real",
+    "author": "user"
+  }
+]

@@ -1,6 +1,6 @@
 # After the Last Listen
 
-A Letterboxd-style album diary. Spec: [`docs/prd.md`](docs/prd.md). Working rules: [`CLAUDE.md`](CLAUDE.md).
+An album diary. Spec: [`docs/prd.md`](docs/prd.md). Working rules: [`CLAUDE.md`](CLAUDE.md).
 
 ## Setup
 
