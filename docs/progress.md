@@ -2,7 +2,7 @@
 
 Status of each phase in `docs/prd.md` §12. Updated at the end of every task (see CLAUDE.md).
 
-Last updated: 2026-11-17
+Last updated: 2026-11-20
 
 ## Phase 1: Foundation + search spike (in progress)
 
@@ -11,7 +11,7 @@ Done when: a user can register, sign in and edit their profile; and the correct 
 - [x] Project scaffold: pnpm monorepo, Next.js + Tailwind in `apps/web`, local Supabase, Supabase clients and session refresh, pgTAP test harness, lint/typecheck
 - [x] Auth: email/password sign-up (with username), email confirmation, sign-in, sign-out, password reset; `/settings` and `/reset-password` require a session (branch `feat/profiles-auth`, not merged yet)
 - [x] Profile: `profiles` table created on sign-up, `update_profile()` RPC, edit-profile page, public `/u/[username]` page with private toggle (branch `feat/profiles-auth`, not merged yet)
-- [ ] Avatar upload: Storage bucket, per-user policies, size/type limits, upload UI (deferred from the profile task)
+- [x] Avatar upload: public `avatars` bucket (2 MB, JPEG/PNG/WebP), per-user Storage policies, `set_avatar()` / `remove_avatar()` RPCs, browser crop/resize to 512px, avatar on settings, profile page and header (branch `feat/profiles-auth`, not merged yet)
 - [x] App schema for Phase 1: `profiles` only. The other §6 app tables arrive with the phases that use them (decided 2026-11-17).
 - [x] RLS on every user-owned table, with cross-user access tests (so far just `profiles`; `can_view_user_content()` is ready for the collection and diary tables)
 - [ ] `catalog` schema (artists, albums, album_artists, mbid_redirects)
@@ -53,6 +53,7 @@ Done when: a repeat album appears several times in the diary but once in the col
 
 ## Before launch (carried from earlier phases)
 
+- [ ] Avatar cleanup job for orphaned files; switch avatars to `next/image` with `remotePatterns` (see `docs/decisions.md`, 2026-11-20)
 - [ ] Hosted Supabase: email confirmation on, minimum password length 8, the `supabase/templates/` email templates, site URL and redirect URLs (see `docs/decisions.md`)
 
 ## Phase 5: Polish & launch (not started)

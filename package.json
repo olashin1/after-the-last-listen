@@ -9,12 +9,13 @@
     "build": "pnpm --filter @atll/web build",
     "lint": "pnpm -r --if-present lint",
     "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test",
     "db:start": "supabase start",
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
     "db:test": "supabase test db",
     "db:types": "supabase gen types typescript > packages/types/database.ts",
-    "check": "pnpm typecheck && pnpm lint && pnpm db:test"
+    "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm db:test"
   },
   "packageManager": "pnpm@12.21.0",
   "devDependencies": {

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { getCurrentProfile } from "@/lib/auth";
+import { AvatarForm } from "./avatar-form";
 import { ProfileForm } from "./profile-form";
 
 export const metadata: Metadata = { title: "Edit profile" };
@@ -12,14 +13,17 @@ async function EditProfile() {
   if (!profile) redirect("/sign-in?next=/settings/profile");
 
   return (
-    <ProfileForm
-      initial={{
-        username: profile.username,
-        displayName: profile.display_name ?? "",
-        bio: profile.bio ?? "",
-        visibility: profile.visibility,
-      }}
-    />
+    <>
+      <AvatarForm userId={profile.user_id} path={profile.avatar_url} name={profile.display_name ?? profile.username} />
+      <ProfileForm
+        initial={{
+          username: profile.username,
+          displayName: profile.display_name ?? "",
+          bio: profile.bio ?? "",
+          visibility: profile.visibility,
+        }}
+      />
+    </>
   );
 }
 

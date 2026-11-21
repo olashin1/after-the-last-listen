@@ -52,6 +52,12 @@ export type Database = {
 "is_valid_username":
 { Args: { "p_username": string }; Returns: boolean
                            },
+"remove_avatar":
+{ Args: Record<PropertyKey, never>; Returns: string
+                           },
+"set_avatar":
+{ Args: { "p_path": string }; Returns: string
+                           },
 "update_profile":
 { Args: { "p_bio": string,"p_display_name": string,"p_username": string,"p_visibility": Database["public"]['Enums']["profile_visibility"] }; Returns: {
               "avatar_url": string | null,

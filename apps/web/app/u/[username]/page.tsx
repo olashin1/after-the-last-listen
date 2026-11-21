@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { Avatar } from "@/components/avatar";
 import { getCurrentProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -19,9 +20,12 @@ async function Profile({ params }: { params: PageProps<"/u/[username]">["params"
 
   return (
     <>
-      <header className="flex flex-col gap-1">
-        <h1 className="text-3xl font-semibold tracking-tight">{profile.display_name ?? profile.username}</h1>
-        <p className="text-zinc-500">@{profile.username}</p>
+      <header className="flex items-center gap-4">
+        <Avatar path={profile.avatar_url} name={profile.display_name ?? profile.username} size={80} />
+        <div className="flex min-w-0 flex-col gap-1">
+          <h1 className="text-3xl font-semibold tracking-tight break-words">{profile.display_name ?? profile.username}</h1>
+          <p className="text-zinc-500">@{profile.username}</p>
+        </div>
       </header>
       {profile.bio && <p className="whitespace-pre-line">{profile.bio}</p>}
       {isOwner && (

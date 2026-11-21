@@ -11,7 +11,23 @@ const DB_ERRORS: Record<string, string> = {
   invalid_visibility: "Choose public or private.",
   not_authenticated: "Your session has expired. Sign in again.",
   profile_not_found: "We couldn't find your profile.",
+  invalid_avatar: "That upload didn't go through. Try choosing the image again.",
 };
+
+export const AVATAR_RULES = "JPEG, PNG or WebP. We crop it to a square.";
+
+// Storage API error codes (StorageApiError.code) for avatar uploads.
+// See https://supabase.com/docs/guides/storage/debugging/error-codes
+const STORAGE_ERRORS: Record<string, string> = {
+  EntityTooLarge: "That image is too large. The limit is 2 MB.",
+  InvalidMimeType: "That file type isn't supported. Use JPEG, PNG or WebP.",
+  AccessDenied: "Your session has expired. Sign in again.",
+  InvalidJWT: "Your session has expired. Sign in again.",
+};
+
+export function storageErrorMessage(error: { code?: string }): string {
+  return (error.code && STORAGE_ERRORS[error.code]) ?? GENERIC;
+}
 
 const GENERIC = "Something went wrong. Please try again.";
 

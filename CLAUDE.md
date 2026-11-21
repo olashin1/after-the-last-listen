@@ -43,7 +43,7 @@ Run from the repo root. The Supabase CLI is a devDependency, so call it as `pnpm
 - Web dev server: `pnpm dev`
 - Lint / typecheck: `pnpm lint` / `pnpm typecheck` (all workspaces)
 - Everything before saying a task is done: `pnpm check`
-- Unit tests: no runner yet; one gets added with the first TS module that has logic (see `docs/decisions.md`).
+- Unit tests (Vitest): `pnpm test` (all workspaces)
 
 Next.js is v16: auth session refresh is in `apps/web/proxy.ts` (formerly `middleware.ts`), and the Next docs live in `apps/web/node_modules/next/dist/docs/` (see `apps/web/AGENTS.md`, which `next dev` maintains).
 

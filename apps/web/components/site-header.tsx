@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { signOut } from "@/app/(auth)/actions";
+import { Avatar } from "@/components/avatar";
 import { getCurrentProfile } from "@/lib/auth";
 
 async function AccountLinks() {
@@ -17,7 +18,10 @@ async function AccountLinks() {
 
   return (
     <>
-      <Link href={`/u/${profile.username}`}>@{profile.username}</Link>
+      <Link href={`/u/${profile.username}`} className="flex items-center gap-2">
+        <Avatar path={profile.avatar_url} name={profile.display_name ?? profile.username} size={24} />
+        @{profile.username}
+      </Link>
       <Link href="/settings/profile">Settings</Link>
       <form action={signOut}>
         <button type="submit" className="cursor-pointer">Sign out</button>
