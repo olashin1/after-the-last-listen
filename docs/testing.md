@@ -28,14 +28,33 @@ The SQL test files are in `supabase/tests/`, one per table or function, named af
 
 ## After changing a migration
 
-Apply it, then test. **`pnpm db:reset` wipes all local data**, including accounts you made while testing and the imported catalog.
+While developing, apply it without losing local data, then test:
 
 ```
-pnpm db:reset
+pnpm supabase migration up
 pnpm db:test
 pnpm db:types
 ```
 
+Before committing or merging, rebuild from the migrations alone (the way hosted Supabase and fresh clones will) and run everything. **`pnpm db:reset` wipes all local data**, so restore the catalog afterwards:
+
+```
+pnpm db:reset
+pnpm check
+pnpm catalog:restore
+```
+
+## Test accounts
+
+`pnpm db:reset` creates two confirmed accounts (`supabase/seed.sql`), so there's no sign-up or Mailpit step:
+
+| Email | Password | Username | Profile |
+|---|---|---|---|
+| `alice@demo.test` | `password123` | `demo_alice` | public |
+| `bob@demo.test` | `password123` | `demo_bob` | private |
+
+Local only: they're never created on hosted Supabase.
+
 ## Search accuracy (real catalog data)
 
-The SQL tests use invented albums, so they pass on an empty or a full catalog. Measuring search accuracy needs the real MusicBrainz catalog: import it with `pnpm catalog:import`, then run `pnpm search:eval`. Options, timings and the test-search file are in `packages/worker/README.md`. Re-import (`pnpm catalog:import`, then `pnpm catalog:canonical`) after every `pnpm db:reset`.
+The SQL tests use invented albums, so they pass on an empty or a full catalog. Measuring search accuracy needs the real MusicBrainz catalog: import it with `pnpm catalog:import`, then run `pnpm search:eval`. Options, timings and the test-search file are in `packages/worker/README.md`. After a `pnpm db:reset`, `pnpm catalog:restore` brings the catalog back from a snapshot in a few minutes.
