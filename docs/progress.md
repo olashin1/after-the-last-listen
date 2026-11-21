@@ -47,6 +47,7 @@ Done when: a user can reliably find and inspect an album, including new releases
 Done when: one action saves both the collection record and the diary date; the Shooting Star shows on the album page and in the diary.
 
 - [ ] `log_album` function
+- [ ] Logging works when an album's tracklist isn't loaded; the Shooting Star can be added later (see `docs/decisions.md`, tracklist storage)
 - [ ] Rating, review, Shooting Star
 - [ ] First listen
 - [ ] Shooting Star display

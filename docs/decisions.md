@@ -2,6 +2,13 @@
 
 Open and settled decisions that aren't in `docs/prd.md`. Newest first.
 
+## 2026-11-21: Tracklist storage (decided with the user)
+
+- **Keep the PRD's middle ground:** tracklists load on demand and stay cached in `catalog.tracks`. A pre-warm job loads the most popular albums (about the top 50k) ahead of time.
+- **We don't store every album's tracklist.** It would be about 35M rows, roughly 5–6 GB with indexes (estimate), from a 7–21 GB dump. Every weekly sync would rewrite it, and most of it would never be viewed.
+- **Why pre-warm at all:** a MusicBrainz outage, like the 503s on 2026-11-21, leaves an album page without its tracklist. With pre-warming, nearly every page people open is instant and doesn't depend on MusicBrainz.
+- **Phase 3 follow-up:** if an album's tracklist isn't loaded, logging still works; the Shooting Star can be added later.
+
 ## 2026-11-21: Catalog sync, merges, live search fallback
 
 - **One sync command, `pnpm catalog:sync`** (`packages/worker/src/sync.ts`). It runs the release-group upsert, then canonical releases, then lookups of vanished albums. Each step commits on its own, so a failure at any point leaves the previous catalog searchable (PRD §10). Runs are recorded in `catalog.sync_runs`. An advisory lock allows one sync at a time.
