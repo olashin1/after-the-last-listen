@@ -4,7 +4,6 @@ import { supabaseUrl } from "@/lib/env";
 // enforces the stored-file limits; these are only for early, friendly checks.
 export const AVATAR_BUCKET = "avatars";
 export const AVATAR_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
-export const AVATAR_MAX_BYTES = 2 * 1024 * 1024; // Matches the bucket's file_size_limit.
 export const AVATAR_PIXELS = 512;
 /** Originals above this are refused before decoding; they're resized well below the 2 MB limit. */
 export const AVATAR_MAX_SOURCE_BYTES = 20 * 1024 * 1024;

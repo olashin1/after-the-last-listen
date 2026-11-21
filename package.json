@@ -14,7 +14,10 @@
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
     "db:test": "supabase test db",
-    "db:types": "supabase gen types typescript > packages/types/database.ts",
+    "catalog:import": "pnpm --filter @atll/worker catalog:import",
+    "catalog:canonical": "pnpm --filter @atll/worker catalog:canonical",
+    "search:eval": "pnpm --filter @atll/worker search:eval",
+    "db:types": "supabase gen types typescript --schema public,catalog > packages/types/database.ts",
     "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm db:test"
   },
   "packageManager": "pnpm@12.21.0",

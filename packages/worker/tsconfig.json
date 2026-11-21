@@ -1,7 +1,12 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "types": ["node"]
+    "types": ["node"],
+    // Run directly with node --experimental-strip-types: imports use .ts extensions,
+    // and only erasable TypeScript syntax is allowed (no enums, namespaces, parameter properties).
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true
   },
   "include": ["src"]
 }

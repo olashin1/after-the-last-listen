@@ -2,32 +2,24 @@
 
 import { useRef, useState, useTransition } from "react";
 import { Avatar } from "@/components/avatar";
-import {
-  AVATAR_BUCKET,
-  AVATAR_EXTENSIONS,
-  AVATAR_MAX_BYTES,
-  AVATAR_MAX_SOURCE_BYTES,
-  AVATAR_PIXELS,
-  AVATAR_TYPES,
-} from "@/lib/avatar";
+import { FormMessage, type FormState } from "@/components/form";
+import { AVATAR_BUCKET, AVATAR_EXTENSIONS, AVATAR_MAX_SOURCE_BYTES, AVATAR_PIXELS, AVATAR_TYPES } from "@/lib/avatar";
 import { resizeToSquare } from "@/lib/image";
 import { AVATAR_RULES, storageErrorMessage } from "@/lib/messages";
 import { createClient } from "@/lib/supabase/client";
 import { removeAvatar, setAvatar } from "./actions";
-
-type Message = { error?: string; success?: string };
 
 const buttonClass =
   "cursor-pointer rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-medium disabled:cursor-default disabled:opacity-60 dark:border-zinc-700";
 
 /**
  * Upload goes straight from the browser to Storage (skips the 1 MB Server Action body limit),
- * then the setAvatar action records it through set_avatar(). The bucket and set_avatar()
- * enforce the rules; the checks here only give quicker messages.
+ * then the setAvatar action records it through set_avatar(). The bucket (2 MB, JPEG/PNG/WebP)
+ * and set_avatar() enforce the rules; the checks here only give quicker messages.
  */
 export function AvatarForm({ userId, path, name }: { userId: string; path: string | null; name: string }) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [message, setMessage] = useState<Message>({});
+  const [message, setMessage] = useState<FormState>();
   const [pending, startTransition] = useTransition();
 
   function onFile(file: File | undefined) {
@@ -44,23 +36,23 @@ export function AvatarForm({ userId, path, name }: { userId: string; path: strin
     }
 
     startTransition(async () => {
-      setMessage({});
+      setMessage(undefined);
       let blob: Blob;
       try {
+        // A 512px WebP/JPEG is far below the bucket's 2 MB limit, so no size check after this.
         blob = await resizeToSquare(file, AVATAR_PIXELS);
       } catch {
         setMessage({ error: "We couldn't read that image. Try another file." });
         return;
       }
-      if (blob.size > AVATAR_MAX_BYTES) {
-        setMessage({ error: "That image is too large. The limit is 2 MB." });
-        return;
-      }
 
+      const storage = createClient().storage.from(AVATAR_BUCKET);
       const objectPath = `${userId}/${crypto.randomUUID()}.${AVATAR_EXTENSIONS[blob.type]}`;
-      const { error: uploadError } = await createClient()
-        .storage.from(AVATAR_BUCKET)
-        .upload(objectPath, blob, { contentType: blob.type, cacheControl: "31536000", upsert: false });
+      const { error: uploadError } = await storage.upload(objectPath, blob, {
+        contentType: blob.type,
+        cacheControl: "31536000",
+        upsert: false,
+      });
       if (uploadError) {
         setMessage({ error: storageErrorMessage(uploadError as { code?: string }) });
         return;
@@ -68,8 +60,7 @@ export function AvatarForm({ userId, path, name }: { userId: string; path: strin
 
       const result = await setAvatar(objectPath);
       if (result.error) {
-        // Not recorded, so don't leave the file behind.
-        await createClient().storage.from(AVATAR_BUCKET).remove([objectPath]);
+        await storage.remove([objectPath]); // Not recorded, so don't leave the file behind.
         setMessage({ error: result.error });
         return;
       }
@@ -79,7 +70,7 @@ export function AvatarForm({ userId, path, name }: { userId: string; path: strin
 
   function onRemove() {
     startTransition(async () => {
-      setMessage({});
+      setMessage(undefined);
       const result = await removeAvatar();
       setMessage(result.error ? { error: result.error } : { success: "Photo removed." });
     });
@@ -113,8 +104,7 @@ export function AvatarForm({ userId, path, name }: { userId: string; path: strin
           onChange={(e) => onFile(e.target.files?.[0])}
         />
       </div>
-      {message.error && <p role="alert" className="text-sm text-red-600">{message.error}</p>}
-      {message.success && <p role="status" className="text-sm text-green-700 dark:text-green-500">{message.success}</p>}
+      <FormMessage state={message} />
     </section>
   );
 }

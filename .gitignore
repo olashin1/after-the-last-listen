@@ -34,3 +34,6 @@ supabase/.branches/
 
 # vercel
 .vercel
+
+# downloaded data (MusicBrainz dumps)
+.cache/

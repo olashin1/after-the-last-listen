@@ -2,7 +2,7 @@
 
 Status of each phase in `docs/prd.md` §12. Updated at the end of every task (see CLAUDE.md).
 
-Last updated: 2026-11-20
+Last updated: 2026-11-21
 
 ## Phase 1: Foundation + search spike (in progress)
 
@@ -14,21 +14,21 @@ Done when: a user can register, sign in and edit their profile; and the correct 
 - [x] Avatar upload: public `avatars` bucket (2 MB, JPEG/PNG/WebP), per-user Storage policies, `set_avatar()` / `remove_avatar()` RPCs, browser crop/resize to 512px, avatar on settings, profile page and header (branch `feat/profiles-auth`, not merged yet)
 - [x] App schema for Phase 1: `profiles` only. The other §6 app tables arrive with the phases that use them (decided 2026-11-17).
 - [x] RLS on every user-owned table, with cross-user access tests (so far just `profiles`; `can_view_user_content()` is ready for the collection and diary tables)
-- [ ] `catalog` schema (artists, albums, album_artists, mbid_redirects)
-- [ ] Import a slice of the MusicBrainz dump (one-off script; check the current dump format and license first)
-- [ ] `search_albums(q, lim)` with a trigram index
-- [ ] A 50-query test set of real searches, each with its expected album (open question: who writes it?)
-- [ ] Tune ranking to ≥ 90% correct first result, or write up a recommendation for a secondary search source
+- [x] `catalog` schema (artists, albums, album_artists, mbid_redirects): read-only for clients, service-role writes, no deletes (retire instead), generated `search_text` (branch `feat/catalog-schema`, not merged yet)
+- [x] Import the MusicBrainz release-group dump: all 2.97M Album/EP release groups, CC0 fields only, link-count popularity (`pnpm catalog:import`; branch `feat/catalog-schema`, not merged yet)
+- [x] `search_albums(q, lim)` with a trigram index, plus a tunable core `catalog.search_albums_weighted()` (branch `feat/catalog-schema`, not merged yet)
+- [ ] A 50-query test set of real searches, each with its expected album: 25 of 50 done (Claude’s edge cases). **Waiting on the user’s 25** in `packages/worker/search-eval/queries.json`; eval with `pnpm search:eval`
+- [ ] Tune ranking to ≥ 90% correct first result, or write up a recommendation for a secondary search source. Baseline 80% top-1, p95 6.7 s; see `docs/search-spike.md`
 
-## Phase 2: Catalog (not started)
+## Phase 2: Catalog (in progress)
 
 Done when: a user can reliably find and inspect an album, including new releases; a failed sync leaves search working.
 
 - [ ] Full sync worker (`packages/worker`)
-- [ ] Canonical release mapping
+- [x] Canonical release mapping (`pnpm catalog:canonical`; branch `feat/catalog-schema`, not merged yet)
 - [ ] MBID redirects
-- [ ] On-demand tracklists
-- [ ] Artwork
+- [x] On-demand tracklists: `catalog.tracks`, `set_album_tracks()`, rate-limited MusicBrainz adapter in the web app, album page `/album/[id]` (branch `feat/catalog-schema`, not merged yet)
+- [x] Artwork: Cover Art Archive covers in search results and on the album page, with a placeholder (branch `feat/catalog-schema`, not merged yet)
 - [ ] Live search fallback through the rate-limited MusicBrainz adapter
 - [ ] Weekly sync schedule
 
@@ -53,6 +53,8 @@ Done when: a repeat album appears several times in the diary but once in the col
 
 ## Before launch (carried from earlier phases)
 
+- [ ] MusicBrainz and Cover Art Archive attribution site-wide, and confirm the Cover Art Archive terms (see `docs/decisions.md`)
+- [ ] MusicBrainz adapter: shared rate limit across server instances before deploying (see `docs/decisions.md`, 2026-11-21)
 - [ ] Avatar cleanup job for orphaned files; switch avatars to `next/image` with `remotePatterns` (see `docs/decisions.md`, 2026-11-20)
 - [ ] Hosted Supabase: email confirmation on, minimum password length 8, the `supabase/templates/` email templates, site URL and redirect URLs (see `docs/decisions.md`)
 
@@ -63,6 +65,7 @@ Done when: core workflows work on desktop and mobile web for multiple accounts; 
 - [ ] Top five favorites
 - [ ] Shooting Stars view
 - [ ] Empty states
+- [ ] Visual design pass: give every page and empty space (starting with the landing page) a polished look with pictures, music-themed visuals and intentional spacing
 - [ ] Responsive design
 - [ ] Privacy toggle
 - [ ] Popularity from ListenBrainz
