@@ -39,7 +39,7 @@ Multi-word queries with common words ("dark side of the moon") take **about 7 se
 
 Ordered by expected impact; each one is re-measured with `pnpm search:eval`.
 
-1. **Speed:** a two-stage query. Fetch a capped candidate set ordered by trigram distance using a GiST index (`<<->`), or with a higher threshold first, then score only those. Or strip stop-words ("the", "of") from the candidate query.
+1. **Speed** (partly done: Change 1 below): a two-stage query. Fetch a capped candidate set ordered by trigram distance using a GiST index (`<<->`), or with a higher threshold first, then score only those. Or strip stop-words ("the", "of") from the candidate query.
 2. **Punctuation normalization:** drop punctuation and apostrophes (`’ ' . : -`) in `normalize_text()`. That needs a migration, and `search_text` regenerates.
 3. **Weights:** a stronger popularity weight, and no type penalty when the query names a live/compilation word ("unplugged", "live", "greatest hits"). Try with `pnpm search:eval --weights`.
 4. **Exact-title bonus:** a boost when the normalized query equals the title or title + artist. That fixes self-titled and short-title cases.
@@ -47,3 +47,17 @@ Ordered by expected impact; each one is re-measured with `pnpm search:eval`.
 6. **Better popularity:** link count is a weak proxy (it favored the 2026 Weezer). The 7 GB Postgres dump gives real release counts; ListenBrainz is planned for Phase 5.
 
 Not yet needed: a secondary search source (Apple Music / Deezer). Decide after tuning, once the user's 25 searches are in.
+
+## Change 1 — threshold 0.3 → 0.5 (2026-11-21)
+
+Short common-word searches ("green day", "all time low") timed out on the website: the anon role's 3 s statement timeout cancelled them. At threshold 0.3 "green day" matched ~65k albums, and scoring and sorting them took 6–8 s. Measured with `pnpm search:eval --weights "1,0.15,0.1" --threshold …`:
+
+| Threshold | Top-1 | p50 | p95 | Max |
+|---|---|---|---|---|
+| 0.3 (baseline) | 80.0% | 454 ms | 7,498 ms | 8,454 ms |
+| **0.5 (chosen)** | 80.0% | 115 ms | 472 ms | 622 ms |
+| 0.6 | 80.0% | 54 ms | 214 ms | 250 ms |
+
+Accuracy and misses are identical at all three. 0.5 leaves more room for typos than 0.6 while staying well under the timeout. Migration `20261121120000_search_threshold.sql`. As anon: "green day" 295 ms, "all time low" 254 ms, "dark sid of teh moon" still finds Pink Floyd first.
+
+Still slow: a lone very common word ("the") takes about 3 s because nearly every album matches. Handle it in tuning (e.g. stop words or a minimum word length).
