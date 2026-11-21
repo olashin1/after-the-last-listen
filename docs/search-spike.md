@@ -61,3 +61,47 @@ Short common-word searches ("green day", "all time low") timed out on the websit
 Accuracy and misses are identical at all three. 0.5 leaves more room for typos than 0.6 while staying well under the timeout. Migration `20261121120000_search_threshold.sql`. As anon: "green day" 295 ms, "all time low" 254 ms, "dark sid of teh moon" still finds Pink Floyd first.
 
 Still slow: a lone very common word ("the") takes about 3 s because nearly every album matches. Handle it in tuning (e.g. stop words or a minimum word length).
+
+## Change 2 — punctuation, full similarity, popularity 0.3 (2026-11-21)
+
+**Test set completed by Claude (decided with the user, 2026-11-21).** The user chose not to write their 25 searches. Claude filled the slots with 25 everyday searches (author `claude-everyday`): plain titles, title + artist, a missing "the", two typos. Their expected albums were checked against the local catalog and saved *before* any tuning, so they act as a held-out set. The original 25 are now `claude-edge`.
+
+Baseline with all 50 (threshold 0.5, weights 1/0.15/0.1): **88.0%** top-1 (edge 80%, everyday 96%).
+
+Prototyped with a session-temporary function, then a grid over popularity (0.15, 0.3, 0.5), an exact-match bonus (0, 0.05, 0.1) and full similarity (0, 0.1); 15 of 18 combinations ran:
+
+| Popularity | Exact bonus | Full similarity | Top-1 |
+|---|---|---|---|
+| 0.15 | 0 | 0 | 45/50 (punctuation fix alone) |
+| 0.15 | 0 | 0.1 | 47/50 |
+| 0.3 | 0 | 0 | 47/50 |
+| **0.3** | **0** | **0.1** | **48/50 (chosen)** |
+| 0.3 | 0.05–0.1 | 0–0.1 | 48/50 |
+| 0.5 | 0 | 0–0.1 | 47–48/50 |
+
+The exact-match bonus added nothing on top, so it was left out (simplest formula that wins). Migration `20261121150000_search_tuning.sql`:
+
+1. `normalize_text()` drops apostrophes and periods (`' ’ ‘ \` .`). pg_trgm treats punctuation as a word break, so "pepper’s" was two words, "pepper" and "s". `search_text` is regenerated (`ALTER COLUMN … SET EXPRESSION`, about 4 min locally for 2.97M rows; the snapshot fingerprint is unchanged, so `catalog:restore` still works).
+2. Score adds `similarity(q, search_text) × 0.1`, favoring results that are mostly the query over a one-word match inside a long title.
+3. Popularity weight 0.15 → 0.3.
+
+### Result (live `search_albums`)
+
+| Metric | Result |
+|---|---|
+| Top-1 | **94.0%** (47/50): edge 88%, everyday 100% |
+| Top-5 | 98.0% |
+| MRR | 0.957 |
+| Latency | p50 122 ms, p95 913 ms, max 1,221 ms |
+
+The prototype scored 48; the shipped function scores 47 because it takes candidates only through the new `search_text` (the prototype also matched the old one).
+
+### Remaining misses
+
+| Search | Rank | Why | Fix later |
+|---|---|---|---|
+| `sgt pepper` | 3 | Albums with "Sgt. Pepper" inside a longer title ("Who Killed Sgt. Pepper?") match a partial query as well as the original | Better popularity |
+| `weezer` | 2 | Seven self-titled albums; link count favors the 2026 one | Better popularity (ListenBrainz, Phase 5) |
+| `mbdtf` | not found | Trigrams can't expand abbreviations | Release-group aliases from the dump |
+
+**Recommendation:** no secondary search source is needed for Phase 1. The biggest remaining weakness is the popularity proxy (link count), already planned to be replaced by ListenBrainz.

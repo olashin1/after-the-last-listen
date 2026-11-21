@@ -6,7 +6,7 @@ export type EvalCase = {
   expected: string;
   expected_mbid: string | null;
   category: string;
-  author: "user" | "claude";
+  author: string;
   note?: string;
 };
 

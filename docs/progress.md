@@ -4,7 +4,7 @@ Status of each phase in `docs/prd.md` §12. Updated at the end of every task (se
 
 Last updated: 2026-11-21
 
-## Phase 1: Foundation + search spike (in progress)
+## Phase 1: Foundation + search spike (done)
 
 Done when: a user can register, sign in and edit their profile; and the correct album ranks first for ≥ 90% of test searches, or the spike recommends a secondary search source.
 
@@ -18,8 +18,8 @@ Done when: a user can register, sign in and edit their profile; and the correct 
 - [x] Import the MusicBrainz release-group dump: all 2.97M Album/EP release groups, CC0 fields only, link-count popularity (`pnpm catalog:import`)
 - [x] `search_albums(q, lim)` with a trigram index, plus a tunable core `catalog.search_albums_weighted()`
 - [x] Search speed: word-similarity threshold 0.3 → 0.5, so short common-word searches ("green day") no longer hit the 3 s timeout; accuracy unchanged, p95 0.47 s (`docs/search-spike.md`, Change 1)
-- [ ] A 50-query test set of real searches, each with its expected album: 25 of 50 done (Claude’s edge cases). **Waiting on the user’s 25** in `packages/worker/search-eval/queries.json`; eval with `pnpm search:eval`
-- [ ] Tune ranking to ≥ 90% correct first result, or write up a recommendation for a secondary search source. Baseline 80% top-1, p95 6.7 s; see `docs/search-spike.md`
+- [x] A 50-query test set, each with its expected album: 25 edge cases and 25 everyday searches, all written by Claude (the user chose not to write theirs, 2026-11-21), in `packages/worker/search-eval/queries.json`; eval with `pnpm search:eval`
+- [x] Tune ranking to ≥ 90% correct first result: **94% top-1** (47/50), p95 0.91 s. Apostrophes and periods dropped in normalization, a full-similarity term, popularity weight 0.3; no secondary search source needed (`docs/search-spike.md`, Change 2)
 
 ## Phase 2: Catalog (in progress)
 

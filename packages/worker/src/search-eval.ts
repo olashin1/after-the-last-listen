@@ -1,7 +1,7 @@
 // Search accuracy eval for the Phase 1 spike (PRD §12: correct album first for ≥ 90% of test searches).
 //
 //   pnpm search:eval                          run search-eval/queries.json through public.search_albums
-//   pnpm search:eval --weights 1,0.3,0.1      try other weights (similarity,popularity,type) via the core
+//   pnpm search:eval --weights 1,0.3,0.1,0.1  try other weights (similarity,popularity,type[,full similarity]) via the core
 //   pnpm search:eval --threshold 0.25         try another word-similarity threshold (needs --weights)
 //   pnpm search:eval --verbose                print the top 5 for every query, not only misses
 //
@@ -33,11 +33,11 @@ async function main() {
   const unfilled = cases.length - ready.length;
 
   const weights = args.weights?.split(",").map(Number);
-  if (weights && (weights.length !== 3 || weights.some((w) => !Number.isFinite(w)))) {
-    throw new Error("--weights needs three numbers: similarity,popularity,type");
+  if (weights && (![3, 4].includes(weights.length) || weights.some((w) => !Number.isFinite(w)))) {
+    throw new Error("--weights needs three or four numbers: similarity,popularity,type[,full]");
   }
   if (args.threshold && !weights) throw new Error("--threshold needs --weights (it uses the tunable core)");
-  const threshold = args.threshold ? Number(args.threshold) : 0.3;
+  const threshold = args.threshold ? Number(args.threshold) : 0.5;
 
   const sql = connect({ allowRemote: args["allow-remote"] });
   const results: EvalResult[] = [];
@@ -48,7 +48,7 @@ async function main() {
     for (const c of ready) {
       const t0 = performance.now();
       const rows: Row[] = weights
-        ? await sql`select * from catalog.search_albums_weighted(${c.query}, 50, ${weights[0]!}, ${weights[1]!}, ${weights[2]!}, ${threshold})`
+        ? await sql`select * from catalog.search_albums_weighted(${c.query}, 50, ${weights[0]!}, ${weights[1]!}, ${weights[2]!}, ${threshold}, ${weights[3] ?? 0})`
         : await sql`select * from public.search_albums(${c.query}, 50)`;
       const ms = performance.now() - t0;
       const index = rows.findIndex((r) => r.mbid === c.expected_mbid);

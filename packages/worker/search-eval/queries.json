@@ -4,84 +4,84 @@
     "expected": "OK Computer — Radiohead",
     "expected_mbid": "b1392450-e666-3926-a536-22c65f834433",
     "category": "exact",
-    "author": "claude"
+    "author": "claude-edge"
   },
   {
     "query": "The Dark Side of the Moon",
     "expected": "The Dark Side of the Moon — Pink Floyd",
     "expected_mbid": "f5093c06-23e3-404f-aeaa-40f72885ee3a",
     "category": "exact",
-    "author": "claude"
+    "author": "claude-edge"
   },
   {
     "query": "dark side of the moon",
     "expected": "The Dark Side of the Moon — Pink Floyd",
     "expected_mbid": "f5093c06-23e3-404f-aeaa-40f72885ee3a",
     "category": "no-the",
-    "author": "claude"
+    "author": "claude-edge"
   },
   {
     "query": "dark sid of the mon",
     "expected": "The Dark Side of the Moon — Pink Floyd",
     "expected_mbid": "f5093c06-23e3-404f-aeaa-40f72885ee3a",
     "category": "typo",
-    "author": "claude"
+    "author": "claude-edge"
   },
   {
     "query": "nevermnd",
     "expected": "Nevermind — Nirvana",
     "expected_mbid": "1b022e01-4da6-387b-8658-8678046e4cef",
     "category": "typo",
-    "author": "claude"
+    "author": "claude-edge"
   },
   {
     "query": "kendrick lamar to pimp a butterfly",
     "expected": "To Pimp a Butterfly — Kendrick Lamar",
     "expected_mbid": "d9103c72-3807-4378-9ce7-b6f3e8fdd547",
     "category": "artist+title",
-    "author": "claude"
+    "author": "claude-edge"
   },
   {
     "query": "rumours fleetwood mac",
     "expected": "Rumours — Fleetwood Mac",
     "expected_mbid": "416bb5e5-c7d1-3977-8fd7-7c9daf6c2be6",
     "category": "title+artist",
-    "author": "claude"
+    "author": "claude-edge"
   },
   {
     "query": "sgt pepper",
     "expected": "Sgt. Pepper’s Lonely Hearts Club Band — The Beatles",
     "expected_mbid": "9f7a4c28-8fa2-3113-929c-c47a9f7982c3",
     "category": "partial",
-    "author": "claude"
+    "author": "claude-edge"
   },
   {
     "query": "sgt peppers lonely hearts club band",
     "expected": "Sgt. Pepper’s Lonely Hearts Club Band — The Beatles",
     "expected_mbid": "9f7a4c28-8fa2-3113-929c-c47a9f7982c3",
     "category": "punctuation",
-    "author": "claude"
+    "author": "claude-edge"
   },
   {
     "query": "homogenic",
     "expected": "Homogenic — Björk",
     "expected_mbid": "810272e0-aef1-3d85-b2d3-e512e87fc38c",
     "category": "accents",
-    "author": "claude"
+    "author": "claude-edge"
   },
   {
     "query": "agaetis byrjun",
     "expected": "Ágætis byrjun — Sigur Rós",
     "expected_mbid": "62b427b8-1c52-34e7-b250-da2aa3e44860",
     "category": "accents",
-    "author": "claude"
+    "author": "claude-edge"
   },
   {
     "query": "weezer",
     "expected": "Weezer (1994, the Blue Album) — Weezer",
     "expected_mbid": "c7b245c9-8099-32ea-af95-893acedde2cf",
     "category": "self-titled",
-    "author": "claude",
+    "author": "claude-edge",
     "note": "Weezer has several self-titled albums"
   },
   {
@@ -89,14 +89,14 @@
     "expected": "Blue — Joni Mitchell",
     "expected_mbid": "42d725fb-a8b7-388c-8866-3b02789af326",
     "category": "common-title",
-    "author": "claude"
+    "author": "claude-edge"
   },
   {
     "query": "greatest hits queen",
     "expected": "Greatest Hits — Queen",
     "expected_mbid": "69ce61c8-127f-3809-95d8-62fdf3ae1347",
     "category": "common-title",
-    "author": "claude",
+    "author": "claude-edge",
     "note": "Expected is the 1981 compilation; Queen has later albums with the same title"
   },
   {
@@ -104,7 +104,7 @@
     "expected": "MTV Unplugged in New York — Nirvana",
     "expected_mbid": "fb3770f6-83fb-32b7-85c4-1f522a92287e",
     "category": "live",
-    "author": "claude",
+    "author": "claude-edge",
     "note": "Expected album is live, so the studio boost works against it"
   },
   {
@@ -112,7 +112,7 @@
     "expected": "Thriller — Michael Jackson",
     "expected_mbid": "f32fab67-77dd-3937-addc-9062e28e4c37",
     "category": "common-title",
-    "author": "claude",
+    "author": "claude-edge",
     "note": "Many tributes and same-named albums"
   },
   {
@@ -120,14 +120,14 @@
     "expected": "My Dear Melancholy, — The Weeknd",
     "expected_mbid": "286591d4-ade8-4d24-a804-7024a9b565a4",
     "category": "ep",
-    "author": "claude"
+    "author": "claude-edge"
   },
   {
     "query": "mayhem lady gaga",
     "expected": "Mayhem — Lady Gaga",
     "expected_mbid": "4174e53c-90e8-4630-993f-1f7466178398",
     "category": "recent",
-    "author": "claude",
+    "author": "claude-edge",
     "note": "2025"
   },
   {
@@ -135,7 +135,7 @@
     "expected": "DeBÍ TiRAR MáS FOToS — Bad Bunny",
     "expected_mbid": "b3073a10-2d7c-484c-b387-e49ae629da3d",
     "category": "recent",
-    "author": "claude",
+    "author": "claude-edge",
     "note": "2025; odd capitalization and accents"
   },
   {
@@ -143,7 +143,7 @@
     "expected": "The Life of a Showgirl — Taylor Swift",
     "expected_mbid": "9ae7e7e9-ac40-4874-bd43-d77a9bb9b617",
     "category": "recent",
-    "author": "claude",
+    "author": "claude-edge",
     "note": "2025"
   },
   {
@@ -151,14 +151,14 @@
     "expected": "In the Aeroplane Over the Sea — Neutral Milk Hotel",
     "expected_mbid": "8f310800-045b-3e12-8268-50b3d33a2267",
     "category": "long-title",
-    "author": "claude"
+    "author": "claude-edge"
   },
   {
     "query": "1989 taylor swift",
     "expected": "1989 — Taylor Swift",
     "expected_mbid": "4d9ec1c2-58ec-48a4-aa0a-916718adead0",
     "category": "numbers",
-    "author": "claude",
+    "author": "claude-edge",
     "note": "Also has a 2023 re-recording"
   },
   {
@@ -166,14 +166,14 @@
     "expected": "Kid A — Radiohead",
     "expected_mbid": "e75c0549-ad55-39e3-8025-c72c5d4a3c5d",
     "category": "artist+title",
-    "author": "claude"
+    "author": "claude-edge"
   },
   {
     "query": "mbdtf",
     "expected": "My Beautiful Dark Twisted Fantasy — Kanye West",
     "expected_mbid": "5d6e21e1-deb5-428e-bb42-c2a567f3619b",
     "category": "abbreviation",
-    "author": "claude",
+    "author": "claude-edge",
     "note": "Trigram search cannot expand abbreviations. MusicBrainz has two release groups for this album; expected is the one with more links (9 vs 3)"
   },
   {
@@ -181,182 +181,182 @@
     "expected": "÷ — Ed Sheeran",
     "expected_mbid": "e05f9927-e24b-41c5-928d-d0e008a12444",
     "category": "symbol",
-    "author": "claude",
+    "author": "claude-edge",
     "note": "The title is the ÷ symbol"
   },
   {
-    "query": "",
-    "expected": "",
-    "expected_mbid": null,
-    "category": "real",
-    "author": "user"
+    "query": "abbey road",
+    "expected": "Abbey Road — The Beatles",
+    "expected_mbid": "9162580e-5df4-32de-80cc-f45a8d8a9b1d",
+    "category": "title",
+    "author": "claude-everyday"
   },
   {
-    "query": "",
-    "expected": "",
-    "expected_mbid": null,
-    "category": "real",
-    "author": "user"
+    "query": "good kid maad city",
+    "expected": "good kid, m.A.A.d city — Kendrick Lamar",
+    "expected_mbid": "499c19c8-0dab-4824-884b-6191d145e95b",
+    "category": "punctuation",
+    "author": "claude-everyday"
   },
   {
-    "query": "",
-    "expected": "",
-    "expected_mbid": null,
-    "category": "real",
-    "author": "user"
+    "query": "blonde frank ocean",
+    "expected": "Blonde — Frank Ocean",
+    "expected_mbid": "0da340a0-6ad7-4fc2-a272-6f94393a7831",
+    "category": "title+artist",
+    "author": "claude-everyday"
   },
   {
-    "query": "",
-    "expected": "",
-    "expected_mbid": null,
-    "category": "real",
-    "author": "user"
+    "query": "channel orange",
+    "expected": "channel ORANGE — Frank Ocean",
+    "expected_mbid": "f8f4167d-897c-4b25-a171-638374d1dfa4",
+    "category": "title",
+    "author": "claude-everyday"
   },
   {
-    "query": "",
-    "expected": "",
-    "expected_mbid": null,
-    "category": "real",
-    "author": "user"
+    "query": "random access memories",
+    "expected": "Random Access Memories — Daft Punk",
+    "expected_mbid": "aa997ea0-2936-40bd-884d-3af8a0e064dc",
+    "category": "title",
+    "author": "claude-everyday"
   },
   {
-    "query": "",
-    "expected": "",
-    "expected_mbid": null,
-    "category": "real",
-    "author": "user"
+    "query": "currents tame impala",
+    "expected": "Currents — Tame Impala",
+    "expected_mbid": "08aa7a6c-3e43-4459-87b2-e47faf3a088a",
+    "category": "title+artist",
+    "author": "claude-everyday"
   },
   {
-    "query": "",
-    "expected": "",
-    "expected_mbid": null,
-    "category": "real",
-    "author": "user"
+    "query": "back in black",
+    "expected": "Back in Black — AC/DC",
+    "expected_mbid": "d3bc1a64-7561-3787-b680-0003aa50f8f1",
+    "category": "title",
+    "author": "claude-everyday"
   },
   {
-    "query": "",
-    "expected": "",
-    "expected_mbid": null,
-    "category": "real",
-    "author": "user"
+    "query": "miseducation of lauryn hill",
+    "expected": "The Miseducation of Lauryn Hill — Lauryn Hill",
+    "expected_mbid": "8691d12c-abd8-385c-b1eb-d841190124f7",
+    "category": "no-the",
+    "author": "claude-everyday"
   },
   {
-    "query": "",
-    "expected": "",
-    "expected_mbid": null,
-    "category": "real",
-    "author": "user"
+    "query": "pet sounds",
+    "expected": "Pet Sounds — The Beach Boys",
+    "expected_mbid": "fdd96703-7b21-365e-bdea-38029fbeb84e",
+    "category": "title",
+    "author": "claude-everyday"
   },
   {
-    "query": "",
-    "expected": "",
-    "expected_mbid": null,
-    "category": "real",
-    "author": "user"
+    "query": "purple rain prince",
+    "expected": "Purple Rain — Prince and The Revolution",
+    "expected_mbid": "b93a7c47-a6d4-33f2-9034-53fdd991f4ba",
+    "category": "title+artist",
+    "author": "claude-everyday"
   },
   {
-    "query": "",
-    "expected": "",
-    "expected_mbid": null,
-    "category": "real",
-    "author": "user"
+    "query": "lemonade beyonce",
+    "expected": "Lemonade — Beyoncé",
+    "expected_mbid": "c1f22e07-7bdf-4a4f-8b50-7747c1091ef6",
+    "category": "title+artist",
+    "author": "claude-everyday"
   },
   {
-    "query": "",
-    "expected": "",
-    "expected_mbid": null,
-    "category": "real",
-    "author": "user"
+    "query": "folklore",
+    "expected": "folklore — Taylor Swift",
+    "expected_mbid": "f1d08326-c23b-4b43-be3b-20b33ab10bf6",
+    "category": "title",
+    "author": "claude-everyday"
   },
   {
-    "query": "",
-    "expected": "",
-    "expected_mbid": null,
-    "category": "real",
-    "author": "user"
+    "query": "am arctic monkeys",
+    "expected": "AM — Arctic Monkeys",
+    "expected_mbid": "a348ba2f-f8b3-4686-b928-e63d8d94d543",
+    "category": "title+artist",
+    "author": "claude-everyday"
   },
   {
-    "query": "",
-    "expected": "",
-    "expected_mbid": null,
-    "category": "real",
-    "author": "user"
+    "query": "illmatic",
+    "expected": "Illmatic — Nas",
+    "expected_mbid": "28298e2c-4d70-3eed-a0f5-a3280c662b3d",
+    "category": "title",
+    "author": "claude-everyday"
   },
   {
-    "query": "",
-    "expected": "",
-    "expected_mbid": null,
-    "category": "real",
-    "author": "user"
+    "query": "college dropout",
+    "expected": "The College Dropout — Kanye West",
+    "expected_mbid": "8a01217e-6947-3927-a39b-6691104694f1",
+    "category": "no-the",
+    "author": "claude-everyday"
   },
   {
-    "query": "",
-    "expected": "",
-    "expected_mbid": null,
-    "category": "real",
-    "author": "user"
+    "query": "funeral arcade fire",
+    "expected": "Funeral — Arcade Fire",
+    "expected_mbid": "05affa96-5959-32da-8d75-1c9eb985ca59",
+    "category": "title+artist",
+    "author": "claude-everyday"
   },
   {
-    "query": "",
-    "expected": "",
-    "expected_mbid": null,
-    "category": "real",
-    "author": "user"
+    "query": "is this it",
+    "expected": "Is This It — The Strokes",
+    "expected_mbid": "efea26d1-a016-30f6-b8e2-bc8c02336b0a",
+    "category": "title",
+    "author": "claude-everyday"
   },
   {
-    "query": "",
-    "expected": "",
-    "expected_mbid": null,
-    "category": "real",
-    "author": "user"
+    "query": "hounds of love",
+    "expected": "Hounds of Love — Kate Bush",
+    "expected_mbid": "017f2a37-a78f-3578-9611-fa40408e5d90",
+    "category": "title",
+    "author": "claude-everyday"
   },
   {
-    "query": "",
-    "expected": "",
-    "expected_mbid": null,
-    "category": "real",
-    "author": "user"
+    "query": "ctrl sza",
+    "expected": "Ctrl — SZA",
+    "expected_mbid": "8f892c1b-0709-4cf4-9711-493892a9eb9b",
+    "category": "title+artist",
+    "author": "claude-everyday"
   },
   {
-    "query": "",
-    "expected": "",
-    "expected_mbid": null,
-    "category": "real",
-    "author": "user"
+    "query": "american idiot",
+    "expected": "American Idiot — Green Day",
+    "expected_mbid": "de9bf827-a9b0-348b-a7c9-556c03c3fb07",
+    "category": "title",
+    "author": "claude-everyday"
   },
   {
-    "query": "",
-    "expected": "",
-    "expected_mbid": null,
-    "category": "real",
-    "author": "user"
+    "query": "adele 21",
+    "expected": "21 — Adele",
+    "expected_mbid": "e4174758-d333-4a8e-a31f-dd0edd51518e",
+    "category": "artist+title",
+    "author": "claude-everyday"
   },
   {
-    "query": "",
-    "expected": "",
-    "expected_mbid": null,
-    "category": "real",
-    "author": "user"
+    "query": "igor",
+    "expected": "IGOR — Tyler, The Creator",
+    "expected_mbid": "0f1b9e07-b38b-4bba-9794-55e0924d7177",
+    "category": "title",
+    "author": "claude-everyday"
   },
   {
-    "query": "",
-    "expected": "",
-    "expected_mbid": null,
-    "category": "real",
-    "author": "user"
+    "query": "born to run springsteen",
+    "expected": "Born to Run — Bruce Springsteen",
+    "expected_mbid": "39b22944-7503-3937-8bba-09b17281cc6a",
+    "category": "title+artist",
+    "author": "claude-everyday"
   },
   {
-    "query": "",
-    "expected": "",
-    "expected_mbid": null,
-    "category": "real",
-    "author": "user"
+    "query": "london calling",
+    "expected": "London Calling — The Clash",
+    "expected_mbid": "8d73e45e-7ca1-3cb4-ae28-6da76196c17c",
+    "category": "title",
+    "author": "claude-everyday"
   },
   {
-    "query": "",
-    "expected": "",
-    "expected_mbid": null,
-    "category": "real",
-    "author": "user"
+    "query": "kind of blu miles davis",
+    "expected": "Kind of Blue — Miles Davis",
+    "expected_mbid": "8e8a594f-2175-38c7-a871-abb68ec363e7",
+    "category": "typo",
+    "author": "claude-everyday"
   }
 ]
