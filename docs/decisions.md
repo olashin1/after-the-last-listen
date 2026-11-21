@@ -2,6 +2,32 @@
 
 Open and settled decisions that aren't in `docs/prd.md`. Newest first.
 
+## 2026-11-21: Catalog sync, merges, live search fallback
+
+- **One sync command, `pnpm catalog:sync`** (`packages/worker/src/sync.ts`). It runs the release-group upsert, then canonical releases, then lookups of vanished albums. Each step commits on its own, so a failure at any point leaves the previous catalog searchable (PRD §10). Runs are recorded in `catalog.sync_runs`. An advisory lock allows one sync at a time.
+- **Vanished albums:** active `dump` albums missing from a new dump go into `catalog.sync_vanished` in the same transaction as the upsert. Each is then looked up through the API, one at a time and outside that transaction:
+  - A different MBID back means a merge.
+  - A 404, or a type that's no longer Album or EP, means it's retired.
+  - Anything else is kept, because the dump was behind.
+  - At most 1500 lookups per run (2 s apart, about 50 minutes). The rest wait for the next run and stay searchable meanwhile.
+- **Safety guard:** the upsert rolls back if the dump has fewer than 95% of the active albums, or if more than 2% of them vanished. This protects against a truncated or wrong download.
+- **Albums back in a dump are un-retired**, unless they were merged.
+- **Merges** (`catalog.apply_album_redirect`):
+  - If the survivor is already in the catalog, the old row is retired and `merged_into_id` points at it. Chains are flattened, and the album page redirects (308).
+  - If the survivor isn't in the catalog, the old row takes the new MBID and keeps our ID.
+  - The redirect is recorded in `catalog.mbid_redirects` either way.
+  - **Open (Phase 3):** move `user_albums` and favorites from a merged album to its survivor, handling a user who logged both.
+- **`merged_into_id` is a deferrable foreign key** (checked at commit), so the data-only `catalog:restore` can load rows in any order.
+- **Live search fallback:**
+  - **When it runs:** when local search returns nothing, or its best `match` (word similarity, now returned by `search_albums`) is under `WEAK_MATCH`. Match is used rather than score, because popularity can push a poor text match high. The value and how it was chosen are below.
+  - **The search:** one MusicBrainz release-group search (Albums and EPs, limit 10). It's skipped when the same normalized query went to MusicBrainz in the last 7 days (`catalog.live_searches`), and when the adapter's queue wait is over 2.5 s.
+  - **What it stores:** results go into the catalog with `add_live_albums()` (service role only) as `source = 'live'`. Existing albums are never changed, and MBIDs merged away are skipped.
+  - **Provisional canonical release:** the first official release in the result, so the album page can load tracks straight away. The next canonical dump replaces it.
+  - **The page:** local results show immediately, and the MusicBrainz results stream in underneath. Failures show nothing extra.
+- **Live albums aren't checked for vanishing**, because they may be newer than the dump. They become `dump` albums once a dump includes them. A live album that MusicBrainz later deletes stays active. That's rare and harmless, and can be revisited later.
+- **`/search` is now the real search page** (public, with a search box in the header). `DEBUG_TOOLS` only adds the score and match to each result.
+- **Schedule (decided with the user):** a GitHub Actions workflow, `.github/workflows/catalog-sync.yml`, runs every Sunday at 06:00 UTC (after the Saturday JSON dump) and on demand. It's inactive until the `CATALOG_DATABASE_URL` secret is set, which needs a hosted project. Use the session pooler: runners are IPv4-only, and the advisory lock needs a session.
+
 ## 2026-11-21: Phase 2 plan, shared MusicBrainz adapter
 
 - **Plan (decided with the user):** MBID redirects come from API lookups of only the albums that vanish from a new dump (the JSON dumps have no redirects, and the docs don't confirm that the 7 GB Postgres dump has them). The weekly sync runs as a GitHub Actions cron, inactive until a hosted database exists.

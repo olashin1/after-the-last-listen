@@ -5,7 +5,8 @@ import { supabaseUrl } from "@/lib/env";
 /**
  * Service-role Supabase client. Server-only: it bypasses RLS, so never import this from a Client
  * Component. SUPABASE_SECRET_KEY has no NEXT_PUBLIC_ prefix, so Next never sends it to the browser.
- * Used only for catalog writes the service role owns (set_album_tracks).
+ * Used only for catalog writes the service role owns: set_album_tracks, and the live search fallback
+ * (live_search_due, add_live_albums).
  */
 export function createAdminClient() {
   const key = process.env.SUPABASE_SECRET_KEY;

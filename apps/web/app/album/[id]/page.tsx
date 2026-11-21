@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { Suspense } from "react";
 import { AlbumCover } from "@/components/album-cover";
 import { getAlbumPage } from "@/lib/album";
@@ -16,6 +16,7 @@ async function Album({ params }: { params: PageProps<"/album/[id]">["params"] })
   if (id === null) notFound();
   const page = await getAlbumPage(id);
   if (!page) notFound();
+  if ("mergedInto" in page) permanentRedirect(`/album/${page.mergedInto}`);
   const { album, tracks, status } = page;
 
   const types = [album.primary_type, ...album.secondary_types].join(" · ");

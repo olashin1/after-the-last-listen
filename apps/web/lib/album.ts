@@ -13,6 +13,8 @@ export async function getAlbumPage(albumId: number) {
   const { data: album, error } = await supabase.rpc("get_album", { p_album_id: albumId }).maybeSingle();
   if (error) throw new Error(`get_album failed: ${error.message}`);
   if (!album) return null;
+  // Merged upstream into another album: the page sends visitors to the survivor.
+  if (album.merged_into_id !== null) return { mergedInto: album.merged_into_id } as const;
 
   let status: TracklistStatus = "loaded";
   if (!album.canonical_release_mbid) {

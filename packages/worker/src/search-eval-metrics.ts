@@ -15,7 +15,7 @@ export type EvalResult = {
   /** 1-based position of the expected album in the results, or null if it wasn't returned. */
   rank: number | null;
   ms: number;
-  top: { mbid: string; title: string; artist_credit: string; primary_type: string; secondary_types: string[]; score: number }[];
+  top: { mbid: string; title: string; artist_credit: string; primary_type: string; secondary_types: string[]; score: number; match: number }[];
 };
 
 type Group = { total: number; top1: number };
