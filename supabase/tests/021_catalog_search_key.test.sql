@@ -1,7 +1,7 @@
 -- catalog.normalize_text() and catalog.search_key(): PRD §7 normalization of search_text.
--- Lowercase, unaccented, whitespace collapsed, leading "the" removed (title and credit separately).
+-- Lowercase, unaccented, apostrophes and periods dropped, whitespace collapsed, leading "the" removed (title and credit separately).
 begin;
-select plan(20);
+select plan(24);
 
 select volatility_is('catalog', 'normalize_text', array['text'], 'immutable', 'normalize_text is immutable (needed for a generated column)');
 select volatility_is('catalog', 'search_key', array['text', 'text'], 'immutable', 'search_key is immutable (needed for a generated column)');
@@ -21,6 +21,10 @@ select is(catalog.normalize_text('Meet the Beatles'), 'meet the beatles', 'keeps
 select is(catalog.normalize_text('The'), 'the', 'keeps a lone "the"');
 select is(catalog.normalize_text('The The'), 'the', 'removes only the first "the"');
 select is(catalog.normalize_text(null), '', 'NULL becomes an empty string');
+select is(catalog.normalize_text('Sgt. Zorp’s Club'), 'sgt zorps club', 'drops periods and curly apostrophes');
+select is(catalog.normalize_text('Zorp''s m.A.A.d Kwub'), 'zorps maad kwub', 'drops straight apostrophes and periods inside words');
+select is(catalog.normalize_text('‘Quoxed’ `Blip`'), 'quoxed blip', 'drops single quotes and backticks');
+select is(catalog.normalize_text('The Zorp’s'), 'zorps', 'still removes a leading "the"');
 
 -- search_key
 select is(catalog.search_key('The Dark Side of the Moon', 'Pink Floyd'), 'dark side of the moon pink floyd', 'title then credit');

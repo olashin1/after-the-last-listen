@@ -1,7 +1,7 @@
 -- search_albums(q, lim) and catalog.search_albums_weighted(): matching, ranking, limits, access.
 -- Fixtures use invented words so the tests behave the same on an empty catalog or a full import.
 begin;
-select plan(31);
+select plan(33);
 
 select has_function('public', 'search_albums', array['text', 'integer'], 'search_albums(text, integer) exists');
 select is_definer('public', 'search_albums', array['text', 'integer'], 'search_albums runs as definer (clients never call the core)');
@@ -14,7 +14,9 @@ insert into catalog.albums (mbid, title, artist_credit, primary_type, secondary_
   ('bbbbbbbb-0000-4000-8000-000000000005', 'Qwabby Rhoad', 'The Qwabbles', 'Album', '{}', 0.8, false),
   ('bbbbbbbb-0000-4000-8000-000000000006', 'Zzyqat Retired Gem', 'Gone Upstream', 'Album', '{}', 1.0, true),
   ('bbbbbbbb-0000-4000-8000-000000000007', 'Vrontask Echoes', 'Vrontask', 'EP', '{}', 0.5, false),
-  ('bbbbbbbb-0000-4000-8000-000000000008', 'Vrontask Echoes', 'Vrontask', 'Album', '{}', 0.5, false);
+  ('bbbbbbbb-0000-4000-8000-000000000008', 'Vrontask Echoes', 'Vrontask', 'Album', '{}', 0.5, false),
+  ('bbbbbbbb-0000-4000-8000-000000000009', 'Sgt. Plozzer’s Lonely Zinth Band', 'The Plozzles', 'Album', '{}', 0.5, false),
+  ('bbbbbbbb-0000-4000-8000-000000000010', 'Sgt: Plozzers Lonely Zinth Band Remix Set', 'Plozzles', 'Album', '{}', 0.0, false);
 insert into catalog.albums (mbid, title, artist_credit, primary_type)
   select gen_random_uuid(), 'Klampo Series ' || n, 'Klampo', 'Album' from generate_series(1, 60) n;
 
@@ -47,6 +49,8 @@ select is(pg_temp.rank_of('qwabby rhoad', 'bbbbbbbb-0000-4000-8000-000000000005'
 select is(pg_temp.rank_of('qwabby rhoad qwabbles', 'bbbbbbbb-0000-4000-8000-000000000005'), 1::bigint, 'title then artist');
 select is(pg_temp.rank_of('qwabbles qwabby rhoad', 'bbbbbbbb-0000-4000-8000-000000000005'), 1::bigint, 'artist then title');
 select is(pg_temp.rank_of('the qwabbles qwabby rhoad', 'bbbbbbbb-0000-4000-8000-000000000005'), 1::bigint, 'a leading "the" in the query is ignored');
+select is(pg_temp.rank_of('sgt plozzers lonely zinth band', 'bbbbbbbb-0000-4000-8000-000000000009'), 1::bigint, 'apostrophes and periods are ignored: the real title beats a variant spelled like the query');
+select is(pg_temp.rank_of('sgt plozzer''s lonely zinth band', 'bbbbbbbb-0000-4000-8000-000000000009'), 1::bigint, 'an apostrophe in the query is ignored too');
 select is(pg_temp.rank_of('Zzyqat Retired Gem', 'bbbbbbbb-0000-4000-8000-000000000006'), null::bigint, 'retired albums are never returned');
 select ok(
   pg_temp.rank_of('vrontask echoes', 'bbbbbbbb-0000-4000-8000-000000000008')
@@ -101,7 +105,7 @@ select is(
   (select count(distinct score)::int from catalog.search_albums_weighted('the zorvex side of the moonbeam', 50, 1, 0, 0)
    where mbid in ('bbbbbbbb-0000-4000-8000-000000000001', 'bbbbbbbb-0000-4000-8000-000000000002', 'bbbbbbbb-0000-4000-8000-000000000003')),
   1,
-  'with popularity and type weights at 0, same-title albums tie on similarity'
+  'with popularity, type and full-similarity weights at 0, same-title albums tie on similarity'
 );
 
 select * from finish();

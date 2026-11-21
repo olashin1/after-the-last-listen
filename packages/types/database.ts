@@ -103,7 +103,7 @@ isOneToOne: false
 { Args: { "p_text": string }; Returns: string
                            },
 "search_albums_weighted":
-{ Args: { "p_lim": number,"p_q": string,"p_threshold"?: number,"p_w_pop": number,"p_w_sim": number,"p_w_type": number }; Returns: {
+{ Args: { "p_lim": number,"p_q": string,"p_threshold"?: number,"p_w_full"?: number,"p_w_pop": number,"p_w_sim": number,"p_w_type": number }; Returns: {
               "artist_credit": string,"first_release_date": string,"id": number,"mbid": string,"primary_type": string,"score": number,"secondary_types": (string)[],"title": string
             }[]
                            },

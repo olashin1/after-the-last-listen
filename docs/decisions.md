@@ -27,7 +27,7 @@ Open and settled decisions that aren't in `docs/prd.md`. Newest first.
 - **The import connects with `DATABASE_URL`** (`packages/worker/.env.local`) and refuses non-local hosts without `--allow-remote`.
 - **`search_albums` is `security definer`**, a change from the plan's security invoker. Clients would otherwise need EXECUTE on the tunable core `catalog.search_albums_weighted()`, where a tiny match threshold could scan the whole catalog. The definer function only applies fixed weights and only returns non-retired catalog rows, which are public anyway. The core is executable by the service role (and the eval script's owner connection) only.
 - **Matching:** `pg_trgm` word similarity (`<%`, threshold 0.3) on `search_text`, through a partial GIN index that skips retired albums. The query is normalized with the same `catalog.normalize_text()` as `search_text`. Queries under 2 characters return nothing; `lim` is clamped to 1–50 (default 20).
-- **Test set (decided with the user):** 50 searches in `packages/worker/search-eval/queries.json`, 25 written by the user and 25 edge cases by Claude. `pnpm search:eval` reports top-1 (the PRD target), top-5, MRR and latency, and lists every miss.
+- **Test set (decided with the user):** 50 searches in `packages/worker/search-eval/queries.json`, 25 written by the user and 25 edge cases by Claude. (Changed 2026-11-21: Claude wrote all 50; see below.) `pnpm search:eval` reports top-1 (the PRD target), top-5, MRR and latency, and lists every miss.
 - **Catalog tests use invented names and fake MBIDs**, so they pass on an empty catalog and on a full import.
 - **Debug tools behind `DEBUG_TOOLS=true`** (`apps/web/.env.local`, default `false` in `.env.example`). It turns on a `/search` test page that calls `search_albums()` and shows each result's score and type, plus a "Search (debug)" header link. When it's off, `/search` returns 404 until the real album search page is built (Phase 2). The flag is server-only (`lib/debug.ts`). Keep it off in any deployed environment.
 
@@ -73,3 +73,10 @@ Open and settled decisions that aren't in `docs/prd.md`. Newest first.
 - **No unit-test runner yet.** There's no TypeScript logic to test. Add one (likely Vitest) with the first TS module that has logic, such as the MusicBrainz adapter.
 - **Auth session refresh lives in `apps/web/proxy.ts`** (Next 16 renamed `middleware.ts` to `proxy.ts`) and uses `getClaims()`, following the current Supabase SSR guide. (Since the profiles/auth task it also redirects signed-out visitors away from `/settings` and `/reset-password`.)
 - **Env var names:** `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (publishable key, not the legacy anon key).
+
+## 2026-11-21: Search tuning, Phase 1 closed
+
+- **Test set (decided with the user):** the user chose not to write their 25 searches. Claude wrote 25 everyday searches instead (`claude-everyday` in `queries.json`), with expected albums checked against the catalog and saved before tuning so they work as a held-out check. This departs from the PRD's "50 real searches": none of the 50 come from real users. Revisit with real search logs once people use the app.
+- **Normalization:** `normalize_text()` now drops apostrophes and periods, so "sgt peppers" matches "Sgt. Pepper’s" and "maad" matches "m.A.A.d". Other punctuation stays (pg_trgm already treats it as a word break).
+- **Weights:** similarity 1.0, full similarity 0.1 (new `p_w_full` argument on the core), popularity 0.3 (was 0.15), type 0.1, threshold 0.5. No exact-match bonus: it didn't improve the score.
+- **Result:** 94% top-1 (47/50), so Phase 1's search target is met and no secondary search source is recommended. Known misses (`sgt pepper`, `weezer`, `mbdtf`) need better popularity (ListenBrainz, Phase 5) or aliases.
