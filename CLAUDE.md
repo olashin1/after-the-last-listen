@@ -18,7 +18,8 @@ Letterboxd-style album diary. The full spec is in `docs/prd.md`. Read the releva
 
 ## Architecture rules (do not break these)
 
-- Core writes go through Postgres functions called by RPC (`log_album`, `log_again`, `update_user_album`, `remove_user_album`, `set_favorites`). No business logic in React components or route handlers.
+- Core writes go through Postgres functions called by RPC (`log_album`, `log_again`, `update_user_album`, `remove_user_album`, `set_favorites`, `update_profile`). No business logic in React components or route handlers.
+- Private content (collection, diary, ratings, reviews) is gated in RLS by `can_view_user_content(owner)`. Profile cards are always public.
 - Search is the Postgres function `search_albums(q, lim)` against the local `catalog` schema.
 - Every user-owned table has RLS enabled. The `catalog` schema is readable by everyone and writable only by the service role.
 - MusicBrainz API calls go only through the shared rate-limited server adapter (about 1 request/second, descriptive User-Agent).
@@ -42,7 +43,7 @@ Run from the repo root. The Supabase CLI is a devDependency, so call it as `pnpm
 - Web dev server: `pnpm dev`
 - Lint / typecheck: `pnpm lint` / `pnpm typecheck` (all workspaces)
 - Everything before saying a task is done: `pnpm check`
-- Unit tests: no runner yet; one gets added with the first TS module that has logic (see `docs/decisions.md`).
+- Unit tests (Vitest): `pnpm test` (all workspaces)
 
 Next.js is v16: auth session refresh is in `apps/web/proxy.ts` (formerly `middleware.ts`), and the Next docs live in `apps/web/node_modules/next/dist/docs/` (see `apps/web/AGENTS.md`, which `next dev` maintains).
 

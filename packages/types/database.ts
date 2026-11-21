@@ -23,16 +23,60 @@ export type Database = {
           }
         },"public": {
           Tables: {
-            [_ in never]: never
+            "profiles": {
+                  Row: {
+                    "avatar_url": string | null,"bio": string | null,"created_at": string,"display_name": string | null,"user_id": string,"username": string,"visibility": Database["public"]['Enums']["profile_visibility"]
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "avatar_url"?: string | null,"bio"?: string | null,"created_at"?: string,"display_name"?: string | null,"user_id": string,"username": string,"visibility"?: Database["public"]['Enums']["profile_visibility"]
+                  }
+                  Update: {
+                    "avatar_url"?: string | null,"bio"?: string | null,"created_at"?: string,"display_name"?: string | null,"user_id"?: string,"username"?: string,"visibility"?: Database["public"]['Enums']["profile_visibility"]
+                  }
+                  Relationships: [
+                    
+                  ]
+                }
           }
           Views: {
             [_ in never]: never
           }
           Functions: {
-            [_ in never]: never
+            "can_view_user_content":
+{ Args: { "p_owner": string }; Returns: boolean
+                           },
+"check_username":
+{ Args: { "p_username": string }; Returns: string
+                           },
+"is_valid_username":
+{ Args: { "p_username": string }; Returns: boolean
+                           },
+"remove_avatar":
+{ Args: Record<PropertyKey, never>; Returns: string
+                           },
+"set_avatar":
+{ Args: { "p_path": string }; Returns: string
+                           },
+"update_profile":
+{ Args: { "p_bio": string,"p_display_name": string,"p_username": string,"p_visibility": Database["public"]['Enums']["profile_visibility"] }; Returns: {
+              "avatar_url": string | null,
+"bio": string | null,
+"created_at": string,
+"display_name": string | null,
+"user_id": string,
+"username": string,
+"visibility": Database["public"]['Enums']["profile_visibility"]
+            }
+                          SetofOptions: {
+        from: "*"
+        to: "profiles"
+        isOneToOne: true
+        isSetofReturn: false
+      } }
           }
           Enums: {
-            [_ in never]: never
+            "profile_visibility": "public"|"private"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -152,7 +196,7 @@ export const Constants = {
           }
         },"public": {
           Enums: {
-            
+            "profile_visibility": ["public", "private"]
           }
         }
 } as const
