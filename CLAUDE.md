@@ -12,6 +12,7 @@ Letterboxd-style album diary. The full spec is in `docs/prd.md`. Read the releva
 
 - `apps/web`: Next.js app
 - `packages/worker`: MusicBrainz tools — catalog import, canonical releases, catalog snapshots, search eval (the Phase 2 sync worker grows from here). Runs TypeScript directly with `node --experimental-strip-types`: imports use `.ts` extensions, and only erasable syntax is allowed (no enums or namespaces).
+- `packages/musicbrainz`: the shared rate-limited MusicBrainz API adapter and response mappers, used by the web app and the worker. Same TypeScript rules as the worker (`.ts` imports, erasable syntax only).
 - `packages/types`: TypeScript types generated from the database schema (`public` and `catalog`)
 - `supabase/`: migrations, seed data (`seed.sql`: local test accounts), SQL tests
 - `docs/`: PRD, decisions, progress, testing guide (`testing.md`), search spike notes (`search-spike.md`)
@@ -23,7 +24,7 @@ Letterboxd-style album diary. The full spec is in `docs/prd.md`. Read the releva
 - Private content (collection, diary, ratings, reviews) is gated in RLS by `can_view_user_content(owner)`. Profile cards (including the avatar) are always public.
 - Search is the Postgres function `search_albums(q, lim)` against the local `catalog` schema. It's `security definer` and calls the tunable core `catalog.search_albums_weighted()`, which clients must not be able to execute.
 - Every user-owned table has RLS enabled. The `catalog` schema is readable by everyone and writable only by the service role. It isn't exposed in the Data API; clients reach it through `public` functions (`search_albums`, `get_album`, `get_album_tracks`).
-- MusicBrainz API calls go only through the shared rate-limited server adapter, `apps/web/lib/musicbrainz.ts` (requests 1.1 s apart, User-Agent `AfterTheLastListen/0.1 ( https://github.com/olashin1/after-the-last-listen )`). Dump downloads aren't API calls but send the same User-Agent.
+- MusicBrainz API calls go only through the shared rate-limited adapter in `packages/musicbrainz` (`createMusicBrainzClient`). Every request sends the User-Agent `AfterTheLastListen/0.1 ( https://github.com/olashin1/after-the-last-listen )`. The web app has one client, `apps/web/lib/musicbrainz.ts`, with requests 1.1 s apart. The worker has its own slower client. Dump downloads aren't API calls but send the same User-Agent.
 - The service role key and other secrets never reach client code or get committed. Use `.env.local`, and keep `.env.example` up to date. In the web app the key is `SUPABASE_SECRET_KEY`, read only by the server-only `lib/supabase/admin.ts`, and used only for service-role catalog writes (`set_album_tracks`).
 - Our own numeric IDs are primary keys; MBIDs live in unique columns. Never hard-delete a catalog artist or album; set `retired = true` instead (enforced by grants and triggers). `catalog.tracks` and `catalog.album_artists` are replaceable caches of upstream data and may be rewritten.
 - Never store MusicBrainz annotation, genres, ratings or tags: they're CC BY-NC-SA, while the rest of the data is CC0.

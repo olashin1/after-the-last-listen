@@ -2,6 +2,13 @@
 
 Open and settled decisions that aren't in `docs/prd.md`. Newest first.
 
+## 2026-11-21: Phase 2 plan, shared MusicBrainz adapter
+
+- **Plan (decided with the user):** MBID redirects come from API lookups of only the albums that vanish from a new dump (the JSON dumps have no redirects, and the docs don't confirm that the 7 GB Postgres dump has them). The weekly sync runs as a GitHub Actions cron, inactive until a hosted database exists.
+- **The adapter is now a workspace package, `packages/musicbrainz`**, so the sync worker can call the API too. `createMusicBrainzClient({ minIntervalMs })` gives each process its own queue. The web app's client (`apps/web/lib/musicbrainz.ts`) spaces requests 1.1 s apart, the same as before. The track mapper moved with it. The web app loads the package through `transpilePackages` and `allowImportingTsExtensions`. The worker runs it with type stripping (Node resolves the workspace symlink, so the files aren't under `node_modules`).
+- **Fail fast when busy:** `get(..., { maxQueueWaitMs })` throws `MusicBrainzBusy` without sending anything when the queue wait would be longer than that. It's for the live search fallback, so a search never waits behind a queue.
+- **Worker and web share one IP limit.** Their queues are separate, so the worker's redirect lookups use a 2 s interval. That keeps the two together at about 1 request per second.
+
 ## 2026-11-21: Album page, cover art, tracklists
 
 - **Canonical edition (decided with the user):** each album shows the tracklist of MusicBrainz's canonical release, from the canonical data dump (`canonical/canonical_release_redirect.csv`, CC0, refreshed on the 1st and 15th). `pnpm catalog:canonical` loads it into `catalog.albums.canonical_release_mbid`. The archive is 2.4 GB `.tar.zst`; the system `tar` must read zstd (Windows' built-in `tar.exe` does; Git Bash's GNU tar needs a separate `zstd`).

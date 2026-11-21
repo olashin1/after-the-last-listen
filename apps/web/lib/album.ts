@@ -2,7 +2,7 @@
 // Tracklists load on demand (PRD §7): the first visit fetches the canonical release's tracks from
 // MusicBrainz and stores them with set_album_tracks(); later visits read them from the catalog.
 
-import { fetchReleaseTracks } from "@/lib/musicbrainz";
+import { musicbrainz } from "@/lib/musicbrainz";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -19,7 +19,7 @@ export async function getAlbumPage(albumId: number) {
     status = "no_release";
   } else if (!album.tracks_current) {
     try {
-      const tracks = await fetchReleaseTracks(album.canonical_release_mbid);
+      const tracks = await musicbrainz.fetchReleaseTracks(album.canonical_release_mbid);
       if (tracks.length === 0) {
         status = "unavailable";
       } else {

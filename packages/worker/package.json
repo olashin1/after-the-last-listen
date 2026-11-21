@@ -13,6 +13,7 @@
     "catalog:restore": "node --env-file-if-exists=.env.local --experimental-strip-types --no-warnings=ExperimentalWarning src/catalog-snapshot.ts restore"
   },
   "dependencies": {
+    "@atll/musicbrainz": "workspace:*",
     "postgres": "3.4.9"
   },
   "devDependencies": {

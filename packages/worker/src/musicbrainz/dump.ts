@@ -11,12 +11,12 @@ import path from "node:path";
 import { createInterface } from "node:readline";
 import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
+// Same User-Agent as the API adapter, so MetaBrainz sees one identifiable client.
+import { USER_AGENT } from "@atll/musicbrainz";
 
 export const DUMP_BASE = "https://data.metabrainz.org/pub/musicbrainz/data/json-dumps";
 export const CANONICAL_BASE = "https://data.metabrainz.org/pub/musicbrainz/canonical_data";
 export const RELEASE_GROUP_FILE = "release-group.tar.xz";
-// Contact URL decided with the user (2026-11-21): the project's public GitHub page.
-export const USER_AGENT = "AfterTheLastListen/0.1 ( https://github.com/olashin1/after-the-last-listen )";
 
 type Log = (msg: string) => void;
 

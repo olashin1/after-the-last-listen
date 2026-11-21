@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   // Workspace packages ship TypeScript source.
-  transpilePackages: ["@atll/types"],
+  transpilePackages: ["@atll/types", "@atll/musicbrainz"],
   turbopack: {
     // Monorepo root, so workspace packages resolve.
     root: path.join(__dirname, "..", ".."),

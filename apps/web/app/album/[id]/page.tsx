@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { AlbumCover } from "@/components/album-cover";
 import { getAlbumPage } from "@/lib/album";
-import { formatDuration } from "@/lib/musicbrainz-map";
+import { formatDuration } from "@atll/musicbrainz";
 
 // Album page (PRD Phase 2 "find and inspect an album"): cover, title, then the canonical release's
 // tracklist from the first track to the last. Logging (Phase 3) will be added here.
