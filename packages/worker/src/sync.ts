@@ -6,6 +6,7 @@
 //   pnpm catalog:sync --canonical-folder <name>  a specific canonical dump
 //   pnpm catalog:sync --skip-canonical       don't load canonical releases this run
 //   pnpm catalog:sync --max-lookups 200      cap MusicBrainz API lookups of vanished albums (default 1500)
+//   pnpm catalog:sync --lookups-only         only retry the vanished albums still queued (no downloads)
 //   pnpm catalog:sync --allow-remote         required for a non-local DATABASE_URL (the scheduled run)
 //
 // Steps, each committed on its own so a failure anywhere leaves the previous catalog searchable:
@@ -32,6 +33,7 @@ const { values: args } = parseArgs({
     file: { type: "string" },
     "canonical-folder": { type: "string" },
     "skip-canonical": { type: "boolean", default: false },
+    "lookups-only": { type: "boolean", default: false },
     "max-lookups": { type: "string", default: "1500" },
     "allow-remote": { type: "boolean", default: false },
   },
@@ -64,29 +66,16 @@ async function main() {
     `;
     if (stale.count > 0) log(`Marked ${stale.count} interrupted run(s) as failed.`);
 
-    const dumpDate = args.date ?? (args.file ? "local-file" : await latestDumpDate());
+    const lookupsOnly = args["lookups-only"];
+    const dumpDate = lookupsOnly ? null : (args.date ?? (args.file ? "local-file" : await latestDumpDate()));
     const [{ id }] = (await sql`
       insert into catalog.sync_runs (dump_date) values (${dumpDate}) returning id::int as id
     `) as unknown as [{ id: number }];
     runId = id;
-    log(`Sync run ${runId}: release-group dump ${dumpDate}`);
+    log(`Sync run ${runId}: ${dumpDate ? `release-group dump ${dumpDate}` : "lookups only"}`);
 
-    // 1. Release groups.
-    const archive = args.file ?? (await ensureReleaseGroupDump(CACHE_DIR, dumpDate, log));
-    const { albums, stats } = readReleaseGroups(archive, { log });
-    counts.albums = await loadAlbums(sql, albums, log, { vanished: { runId } });
-    counts.read = stats;
-    await saveCounts(sql, runId, counts);
-
-    // 2. Canonical releases (published twice a month; an unchanged folder changes nothing).
-    let canonicalFolder: string | null = null;
-    if (!args["skip-canonical"]) {
-      canonicalFolder = args["canonical-folder"] ?? (await latestCanonicalDump());
-      const canonicalArchive = await ensureCanonicalDump(CACHE_DIR, canonicalFolder, log);
-      counts.canonical = await loadCanonical(sql, canonicalArchive, canonicalFolder, log);
-      await sql`update catalog.sync_runs set canonical_folder = ${canonicalFolder} where id = ${runId}`;
-      await saveCounts(sql, runId, counts);
-    }
+    // 1–2. Release groups, then canonical releases.
+    const canonicalFolder = dumpDate ? await loadDumps(sql, runId, dumpDate, counts) : null;
 
     // 3. Vanished albums.
     const mb = createMusicBrainzClient({ minIntervalMs: WORKER_MIN_INTERVAL_MS });
@@ -98,7 +87,7 @@ async function main() {
     `;
     log(`Sync run ${runId} succeeded.`);
 
-    if (!args.file && canonicalFolder) await pruneDownloads(CACHE_DIR, { dumpDate, canonicalFolder }, log);
+    if (dumpDate && !args.file && canonicalFolder) await pruneDownloads(CACHE_DIR, { dumpDate, canonicalFolder }, log);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     if (runId !== null) {
@@ -112,6 +101,30 @@ async function main() {
   } finally {
     await sql.end();
   }
+}
+
+/** Steps 1 and 2. Returns the canonical dump folder used, or null when skipped. */
+async function loadDumps(
+  sql: ReturnType<typeof connect>,
+  runId: number,
+  dumpDate: string,
+  counts: Record<string, unknown>,
+): Promise<string | null> {
+  // 1. Release groups.
+  const archive = args.file ?? (await ensureReleaseGroupDump(CACHE_DIR, dumpDate, log));
+  const { albums, stats } = readReleaseGroups(archive, { log });
+  counts.albums = await loadAlbums(sql, albums, log, { vanished: { runId } });
+  counts.read = stats;
+  await saveCounts(sql, runId, counts);
+
+  // 2. Canonical releases (published twice a month; an unchanged folder changes nothing).
+  if (args["skip-canonical"]) return null;
+  const canonicalFolder = args["canonical-folder"] ?? (await latestCanonicalDump());
+  const canonicalArchive = await ensureCanonicalDump(CACHE_DIR, canonicalFolder, log);
+  counts.canonical = await loadCanonical(sql, canonicalArchive, canonicalFolder, log);
+  await sql`update catalog.sync_runs set canonical_folder = ${canonicalFolder} where id = ${runId}`;
+  await saveCounts(sql, runId, counts);
+  return canonicalFolder;
 }
 
 async function saveCounts(sql: ReturnType<typeof connect>, runId: number, counts: Record<string, unknown>) {

@@ -21,7 +21,7 @@ Done when: a user can register, sign in and edit their profile; and the correct 
 - [x] A 50-query test set, each with its expected album: 25 edge cases and 25 everyday searches, all written by Claude (the user chose not to write theirs, 2026-11-21), in `packages/worker/search-eval/queries.json`; eval with `pnpm search:eval`
 - [x] Tune ranking to ≥ 90% correct first result: **94% top-1** (47/50), p95 0.91 s. Apostrophes and periods dropped in normalization, a full-similarity term, popularity weight 0.3; no secondary search source needed (`docs/search-spike.md`, Change 2)
 
-## Phase 2: Catalog (done in code; scheduled run waits for a hosted database)
+## Phase 2: Catalog (done; the scheduled run waits for a hosted database)
 
 Done when: a user can reliably find and inspect an album, including new releases; a failed sync leaves search working.
 
@@ -31,6 +31,7 @@ Done when: a user can reliably find and inspect an album, including new releases
 - [x] MBID redirects: API lookups of vanished albums. First run: 39 merged, 13 deleted, 16 no longer albums; 18 left queued after MusicBrainz 503s and timeouts. Merged albums are retired and point at the survivor, and their pages redirect.
 - [x] On-demand tracklists: `catalog.tracks`, `set_album_tracks()`, rate-limited MusicBrainz adapter in the web app, album page `/album/[id]`
 - [x] Artwork: Cover Art Archive covers in search results and on the album page, with a placeholder
+- [x] Reliability: the adapter retries 503s, timeouts and network errors with backoff, the album page streams its tracklist separately, and `catalog:sync --lookups-only` retries queued lookups
 - [x] Real search page `/search` (public, header search box); scores only with `DEBUG_TOOLS`
 - [x] Live search fallback: a top match under 0.8 (or no results) triggers one MusicBrainz search, at most weekly per query, and new albums are added with `add_live_albums()`. Tested against the live API with weak queries; adding brand-new albums is covered by SQL tests, because no release newer than the dump could be found to try it in the browser.
 - [x] Weekly sync schedule: `.github/workflows/catalog-sync.yml` (Sundays 06:00 UTC), inactive until the `CATALOG_DATABASE_URL` secret exists

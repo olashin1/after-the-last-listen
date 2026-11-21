@@ -52,7 +52,8 @@ export async function liveFallback(q: string, alreadyShown: Set<number>): Promis
     const body = await musicbrainz.get(
       "release-group",
       { query: releaseGroupSearchQuery(q), limit: String(LIVE_LIMIT) },
-      { maxQueueWaitMs: MAX_QUEUE_WAIT_MS },
+      // No retries: the searcher is waiting, and the next search for this query tries again.
+      { maxQueueWaitMs: MAX_QUEUE_WAIT_MS, retries: 0 },
     );
     const albums = mapReleaseGroupSearch(body);
     const { data: added, error: addError } = await admin.rpc("add_live_albums", { p_query: q, p_albums: albums });
