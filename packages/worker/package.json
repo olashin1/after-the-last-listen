@@ -8,7 +8,9 @@
     "test": "vitest run",
     "catalog:import": "node --env-file-if-exists=.env.local --experimental-strip-types --no-warnings=ExperimentalWarning src/import-release-groups.ts",
     "search:eval": "node --env-file-if-exists=.env.local --experimental-strip-types --no-warnings=ExperimentalWarning src/search-eval.ts",
-    "catalog:canonical": "node --env-file-if-exists=.env.local --experimental-strip-types --no-warnings=ExperimentalWarning src/import-canonical.ts"
+    "catalog:canonical": "node --env-file-if-exists=.env.local --experimental-strip-types --no-warnings=ExperimentalWarning src/import-canonical.ts",
+    "catalog:snapshot": "node --env-file-if-exists=.env.local --experimental-strip-types --no-warnings=ExperimentalWarning src/catalog-snapshot.ts snapshot",
+    "catalog:restore": "node --env-file-if-exists=.env.local --experimental-strip-types --no-warnings=ExperimentalWarning src/catalog-snapshot.ts restore"
   },
   "dependencies": {
     "postgres": "3.4.9"

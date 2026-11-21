@@ -16,6 +16,8 @@
     "db:test": "supabase test db",
     "catalog:import": "pnpm --filter @atll/worker catalog:import",
     "catalog:canonical": "pnpm --filter @atll/worker catalog:canonical",
+    "catalog:snapshot": "pnpm --filter @atll/worker catalog:snapshot",
+    "catalog:restore": "pnpm --filter @atll/worker catalog:restore",
     "search:eval": "pnpm --filter @atll/worker search:eval",
     "db:types": "supabase gen types typescript --schema public,catalog > packages/types/database.ts",
     "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm db:test"

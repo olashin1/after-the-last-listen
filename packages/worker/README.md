@@ -28,7 +28,7 @@ pnpm catalog:import --date 20261118-001001   # a specific dump
 - The dump (about 1.3 GB) is cached in `.cache/musicbrainz/<date>/` (gitignored) and checked against the published SHA-256.
 - Only Album and EP release groups are kept. Genres, tags, ratings and annotations are never stored (they're under a non-commercial license).
 - Everything loads in one transaction, and re-running the same dump changes nothing.
-- `pnpm db:reset` empties the catalog; run the import (and `pnpm catalog:canonical`) again afterwards.
+- `pnpm db:reset` empties the catalog. Restore it from a snapshot (below) instead of re-importing.
 
 ## Canonical releases (which edition's tracklist an album shows)
 
@@ -42,6 +42,19 @@ pnpm catalog:canonical --folder musicbrainz-canonical-dump-20261117-080003
 - The canonical data dump (about 2.4 GB `.tar.zst`, CC0) is cached in `.cache/musicbrainz/canonical/` and checked against its SHA-256.
 - It sets `catalog.albums.canonical_release_mbid`. Album pages then fetch that release's tracklist from the MusicBrainz API on first view.
 - Your `tar` must read zstd. Windows' built-in `tar.exe` (used from PowerShell) does; Git Bash's GNU tar needs `zstd` installed.
+
+## Snapshot and restore
+
+A full import takes 20–25 minutes (catalog plus canonical releases). A snapshot takes about 40 seconds (293 MB) and restores in about 6 minutes.
+
+```
+pnpm catalog:snapshot   # after an import: save the catalog to .cache/catalog/catalog.dump
+pnpm catalog:restore    # after pnpm db:reset: load it back into the empty catalog
+```
+
+- Runs `pg_dump` / `pg_restore` inside the local Supabase database container, so Docker must be running.
+- Restore only works on an empty catalog, and only if the catalog tables' columns are the same as when the snapshot was taken. Migrations that don't touch the catalog don't matter; after one that changes catalog tables, re-import and take a new snapshot.
+- Tracklists already loaded by album pages are included, so they don't need fetching from MusicBrainz again.
 
 ## Search eval
 
