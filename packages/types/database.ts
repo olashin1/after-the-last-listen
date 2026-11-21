@@ -33,17 +33,23 @@ isOneToOne: false
                   ]
                 },"albums": {
                   Row: {
-                    "artist_credit": string,"canonical_release_mbid": string | null,"first_release_date": string | null,"id": number,"link_count": number,"mbid": string,"popularity": number,"primary_type": string,"release_count": number,"retired": boolean,"search_text": string,"secondary_types": (string)[],"title": string,"tracks_loaded_at": string | null,"tracks_release_mbid": string | null,"updated_at": string
+                    "artist_credit": string,"canonical_release_mbid": string | null,"created_at": string,"first_release_date": string | null,"id": number,"link_count": number,"mbid": string,"merged_into_id": number | null,"popularity": number,"primary_type": string,"release_count": number,"retired": boolean,"search_text": string,"secondary_types": (string)[],"source": string,"title": string,"tracks_loaded_at": string | null,"tracks_release_mbid": string | null,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "artist_credit": string,"canonical_release_mbid"?: string | null,"first_release_date"?: string | null,"id"?: never,"link_count"?: number,"mbid": string,"popularity"?: number,"primary_type": string,"release_count"?: number,"retired"?: boolean,"search_text"?: never,"secondary_types"?: (string)[],"title": string,"tracks_loaded_at"?: string | null,"tracks_release_mbid"?: string | null,"updated_at"?: string
+                    "artist_credit": string,"canonical_release_mbid"?: string | null,"created_at"?: string,"first_release_date"?: string | null,"id"?: never,"link_count"?: number,"mbid": string,"merged_into_id"?: number | null,"popularity"?: number,"primary_type": string,"release_count"?: number,"retired"?: boolean,"search_text"?: never,"secondary_types"?: (string)[],"source"?: string,"title": string,"tracks_loaded_at"?: string | null,"tracks_release_mbid"?: string | null,"updated_at"?: string
                   }
                   Update: {
-                    "artist_credit"?: string,"canonical_release_mbid"?: string | null,"first_release_date"?: string | null,"id"?: never,"link_count"?: number,"mbid"?: string,"popularity"?: number,"primary_type"?: string,"release_count"?: number,"retired"?: boolean,"search_text"?: never,"secondary_types"?: (string)[],"title"?: string,"tracks_loaded_at"?: string | null,"tracks_release_mbid"?: string | null,"updated_at"?: string
+                    "artist_credit"?: string,"canonical_release_mbid"?: string | null,"created_at"?: string,"first_release_date"?: string | null,"id"?: never,"link_count"?: number,"mbid"?: string,"merged_into_id"?: number | null,"popularity"?: number,"primary_type"?: string,"release_count"?: number,"retired"?: boolean,"search_text"?: never,"secondary_types"?: (string)[],"source"?: string,"title"?: string,"tracks_loaded_at"?: string | null,"tracks_release_mbid"?: string | null,"updated_at"?: string
                   }
                   Relationships: [
-                    
+                    {
+      foreignKeyName: "albums_merged_into_id_fkey"
+      columns: ["merged_into_id"]
+isOneToOne: false
+      referencedRelation: "albums"
+      referencedColumns: ["id"]
+    }
                   ]
                 },"artists": {
                   Row: {
@@ -55,6 +61,20 @@ isOneToOne: false
                   }
                   Update: {
                     "disambiguation"?: string | null,"id"?: never,"mbid"?: string,"name"?: string,"retired"?: boolean,"sort_name"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"live_searches": {
+                  Row: {
+                    "found": number,"query_key": string,"searched_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "found"?: number,"query_key": string,"searched_at"?: string
+                  }
+                  Update: {
+                    "found"?: number,"query_key"?: string,"searched_at"?: string
                   }
                   Relationships: [
                     
@@ -72,6 +92,46 @@ isOneToOne: false
                   }
                   Relationships: [
                     
+                  ]
+                },"sync_runs": {
+                  Row: {
+                    "canonical_folder": string | null,"counts": NonNullable<Json>,"dump_date": string | null,"error": string | null,"finished_at": string | null,"id": number,"started_at": string,"status": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "canonical_folder"?: string | null,"counts"?: NonNullable<Json>,"dump_date"?: string | null,"error"?: string | null,"finished_at"?: string | null,"id"?: never,"started_at"?: string,"status"?: string
+                  }
+                  Update: {
+                    "canonical_folder"?: string | null,"counts"?: NonNullable<Json>,"dump_date"?: string | null,"error"?: string | null,"finished_at"?: string | null,"id"?: never,"started_at"?: string,"status"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"sync_vanished": {
+                  Row: {
+                    "album_id": number,"found_at": string,"run_id": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "album_id": number,"found_at"?: string,"run_id": number
+                  }
+                  Update: {
+                    "album_id"?: number,"found_at"?: string,"run_id"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "sync_vanished_album_id_fkey"
+      columns: ["album_id"]
+isOneToOne: true
+      referencedRelation: "albums"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "sync_vanished_run_id_fkey"
+      columns: ["run_id"]
+isOneToOne: false
+      referencedRelation: "sync_runs"
+      referencedColumns: ["id"]
+    }
                   ]
                 },"tracks": {
                   Row: {
@@ -99,12 +159,18 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "normalize_text":
+            "apply_album_redirect":
+{ Args: { "p_new": string,"p_old": string }; Returns: string
+                           },
+"normalize_text":
 { Args: { "p_text": string }; Returns: string
+                           },
+"retire_album":
+{ Args: { "p_album_id": number }; Returns: undefined
                            },
 "search_albums_weighted":
 { Args: { "p_lim": number,"p_q": string,"p_threshold"?: number,"p_w_full"?: number,"p_w_pop": number,"p_w_sim": number,"p_w_type": number }; Returns: {
-              "artist_credit": string,"first_release_date": string,"id": number,"mbid": string,"primary_type": string,"score": number,"secondary_types": (string)[],"title": string
+              "artist_credit": string,"first_release_date": string,"id": number,"match": number,"mbid": string,"primary_type": string,"score": number,"secondary_types": (string)[],"title": string
             }[]
                            },
 "search_key":
@@ -139,7 +205,10 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "can_view_user_content":
+            "add_live_albums":
+{ Args: { "p_albums": Json,"p_query": string }; Returns: number
+                           },
+"can_view_user_content":
 { Args: { "p_owner": string }; Returns: boolean
                            },
 "check_username":
@@ -147,7 +216,7 @@ isOneToOne: false
                            },
 "get_album":
 { Args: { "p_album_id": number }; Returns: {
-              "artist_credit": string,"canonical_release_mbid": string,"first_release_date": string,"id": number,"mbid": string,"primary_type": string,"retired": boolean,"secondary_types": (string)[],"title": string,"tracks_current": boolean
+              "artist_credit": string,"canonical_release_mbid": string,"first_release_date": string,"id": number,"mbid": string,"merged_into_id": number,"primary_type": string,"retired": boolean,"secondary_types": (string)[],"title": string,"tracks_current": boolean
             }[]
                            },
 "get_album_tracks":
@@ -158,12 +227,15 @@ isOneToOne: false
 "is_valid_username":
 { Args: { "p_username": string }; Returns: boolean
                            },
+"live_search_due":
+{ Args: { "q": string }; Returns: boolean
+                           },
 "remove_avatar":
 { Args: Record<PropertyKey, never>; Returns: string
                            },
 "search_albums":
 { Args: { "lim"?: number,"q": string }; Returns: {
-              "artist_credit": string,"first_release_date": string,"id": number,"mbid": string,"primary_type": string,"score": number,"secondary_types": (string)[],"title": string
+              "artist_credit": string,"first_release_date": string,"id": number,"match": number,"mbid": string,"primary_type": string,"score": number,"secondary_types": (string)[],"title": string
             }[]
                            },
 "set_album_tracks":

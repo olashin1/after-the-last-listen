@@ -21,17 +21,20 @@ Done when: a user can register, sign in and edit their profile; and the correct 
 - [x] A 50-query test set, each with its expected album: 25 edge cases and 25 everyday searches, all written by Claude (the user chose not to write theirs, 2026-11-21), in `packages/worker/search-eval/queries.json`; eval with `pnpm search:eval`
 - [x] Tune ranking to ≥ 90% correct first result: **94% top-1** (47/50), p95 0.91 s. Apostrophes and periods dropped in normalization, a full-similarity term, popularity weight 0.3; no secondary search source needed (`docs/search-spike.md`, Change 2)
 
-## Phase 2: Catalog (in progress)
+## Phase 2: Catalog (done; the scheduled run waits for a hosted database)
 
 Done when: a user can reliably find and inspect an album, including new releases; a failed sync leaves search working.
 
-- [ ] Full sync worker (`packages/worker`)
-- [x] Canonical release mapping (`pnpm catalog:canonical`)
-- [ ] MBID redirects
+- [x] Shared MusicBrainz API adapter `packages/musicbrainz` (web app and worker), with fail-fast `maxQueueWaitMs`
+- [x] Full sync worker `pnpm catalog:sync`: release groups, canonical releases, and lookups of vanished albums, each step committed on its own. Safety guard against truncated dumps; runs recorded in `catalog.sync_runs`. First real run 2026-11-21: 2.97M albums staged, 3,855 new or changed, 86 vanished, run time 19 min.
+- [x] Canonical release mapping (`pnpm catalog:canonical`, also part of the sync)
+- [x] MBID redirects: API lookups of vanished albums. First run: 39 merged, 13 deleted, 16 no longer albums; 18 left queued after MusicBrainz 503s and timeouts. Merged albums are retired and point at the survivor, and their pages redirect.
 - [x] On-demand tracklists: `catalog.tracks`, `set_album_tracks()`, rate-limited MusicBrainz adapter in the web app, album page `/album/[id]`
 - [x] Artwork: Cover Art Archive covers in search results and on the album page, with a placeholder
-- [ ] Live search fallback through the rate-limited MusicBrainz adapter
-- [ ] Weekly sync schedule
+- [x] Reliability: the adapter retries 503s, timeouts and network errors with backoff, the album page streams its tracklist separately, and `catalog:sync --lookups-only` retries queued lookups
+- [x] Real search page `/search` (public, header search box); scores only with `DEBUG_TOOLS`
+- [x] Live search fallback: a top match under 0.8 (or no results) triggers one MusicBrainz search, at most weekly per query, and new albums are added with `add_live_albums()`. Tested against the live API with weak queries; adding brand-new albums is covered by SQL tests, because no release newer than the dump could be found to try it in the browser.
+- [x] Weekly sync schedule: `.github/workflows/catalog-sync.yml` (Sundays 06:00 UTC), inactive until the `CATALOG_DATABASE_URL` secret exists
 
 ## Developer tooling (not a PRD phase)
 
@@ -45,6 +48,7 @@ Done when: a user can reliably find and inspect an album, including new releases
 Done when: one action saves both the collection record and the diary date; the Shooting Star shows on the album page and in the diary.
 
 - [ ] `log_album` function
+- [ ] Logging works when an album's tracklist isn't loaded; the Shooting Star can be added later (see `docs/decisions.md`, tracklist storage)
 - [ ] Rating, review, Shooting Star
 - [ ] First listen
 - [ ] Shooting Star display
@@ -61,6 +65,8 @@ Done when: a repeat album appears several times in the diary but once in the col
 
 ## Before launch (carried from earlier phases)
 
+- [ ] Turn on the weekly sync: set `CATALOG_DATABASE_URL` (session pooler) once the hosted project exists, then run it once by hand from the Actions tab
+- [ ] Phase 3: move `user_albums` and favorites from a merged album to its survivor in `apply_album_redirect()` (see `docs/decisions.md`)
 - [ ] MusicBrainz and Cover Art Archive attribution site-wide, and confirm the Cover Art Archive terms (see `docs/decisions.md`)
 - [ ] MusicBrainz adapter: shared rate limit across server instances before deploying (see `docs/decisions.md`, 2026-11-21)
 - [ ] Avatar cleanup job for orphaned files; switch avatars to `next/image` with `remotePatterns` (see `docs/decisions.md`, 2026-11-20)

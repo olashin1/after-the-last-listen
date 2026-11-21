@@ -6,6 +6,8 @@
     "allowJs": true,
     "jsx": "react-jsx",
     "incremental": true,
+    // Workspace packages (e.g. @atll/musicbrainz) import each other with .ts extensions.
+    "allowImportingTsExtensions": true,
     "plugins": [{ "name": "next" }],
     "paths": {
       "@/*": ["./*"]

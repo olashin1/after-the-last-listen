@@ -124,6 +124,9 @@ select throws_ok(
   '42501', 'catalog albums rows are never deleted; set retired = true instead',
   'even the owner cannot delete albums'
 );
+-- Run the fixtures' deferred foreign-key checks (merged_into_id) now: Postgres refuses TRUNCATE
+-- with pending trigger events before the trigger under test gets a chance to fire.
+set constraints all immediate;
 select throws_ok($$truncate catalog.albums cascade$$, '42501', null, 'even the owner cannot truncate albums');
 
 -- Signed out.

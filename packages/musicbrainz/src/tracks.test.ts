@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatDuration, mapReleaseTracks } from "./musicbrainz-map";
+import { formatDuration, mapReleaseTracks } from "./tracks.ts";
 
 const rec = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, "0")}`;
 

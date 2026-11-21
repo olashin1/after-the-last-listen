@@ -21,11 +21,13 @@ const { values: args } = parseArgs({
     weights: { type: "string" },
     threshold: { type: "string" },
     verbose: { type: "boolean", default: false },
+    // Live search fallback threshold to report on (apps/web/lib/search.ts WEAK_MATCH).
+    weak: { type: "string", default: "0.8" },
     "allow-remote": { type: "boolean", default: false },
   },
 });
 
-type Row = { mbid: string; title: string; artist_credit: string; primary_type: string; secondary_types: string[]; score: number };
+type Row = { mbid: string; title: string; artist_credit: string; primary_type: string; secondary_types: string[]; score: number; match: number };
 
 async function main() {
   const cases = JSON.parse(await readFile(QUERIES, "utf8")) as EvalCase[];
@@ -69,13 +71,24 @@ async function main() {
   for (const [author, a] of Object.entries(s.byAuthor)) console.log(`  ${author}: top-1 ${pct(a.top1)} of ${a.total}`);
   for (const [category, a] of Object.entries(s.byCategory)) console.log(`  [${category}] top-1 ${pct(a.top1)} of ${a.total}`);
 
+  // Live search fallback (apps/web/lib/search.ts): a top result whose match is under the weak
+  // threshold triggers a MusicBrainz search. Correct top-1 results should almost never be "weak".
+  const weak = Number(args.weak);
+  const okMatches = results.filter((r) => r.rank === 1).map((r) => r.top[0]!.match).sort((a, b) => a - b);
+  const fallbacks = results.filter((r) => r.top.length === 0 || r.top[0]!.match < weak);
+  console.log(
+    `Fallback at match < ${weak}: ${fallbacks.length} of ${results.length} queries would ask MusicBrainz ` +
+      `(${fallbacks.filter((r) => r.rank === 1).length} of them already correct). ` +
+      `Correct top-1 match: min ${okMatches[0]?.toFixed(2) ?? "-"}, p10 ${okMatches[Math.floor(okMatches.length * 0.1)]?.toFixed(2) ?? "-"}`,
+  );
+
   for (const r of results) {
     if (r.rank === 1 && !args.verbose) continue;
     console.log(`\n${r.rank === 1 ? "OK  " : "MISS"} "${r.case.query}" → want ${r.case.expected} (rank ${r.rank ?? "not found"}, ${r.ms.toFixed(0)} ms)`);
     r.top.forEach((t, i) => {
       const flag = t.mbid === r.case.expected_mbid ? " ←" : "";
       const types = [t.primary_type, ...t.secondary_types].join("+");
-      console.log(`     ${i + 1}. ${t.title} — ${t.artist_credit} [${types}] ${t.score.toFixed(3)}${flag}`);
+      console.log(`     ${i + 1}. ${t.title} — ${t.artist_credit} [${types}] ${t.score.toFixed(3)} (match ${t.match.toFixed(2)})${flag}`);
     });
   }
 }

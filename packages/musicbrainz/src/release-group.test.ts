@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mapReleaseGroup } from "./map.ts";
+import { mapReleaseGroup } from "./release-group.ts";
 
 // Shaped like real dump lines (2026-11-18 dump), trimmed. NC-licensed fields left in on purpose
 // to check they're ignored.

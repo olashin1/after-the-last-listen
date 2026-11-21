@@ -16,6 +16,7 @@
     "db:test": "supabase test db",
     "catalog:import": "pnpm --filter @atll/worker catalog:import",
     "catalog:canonical": "pnpm --filter @atll/worker catalog:canonical",
+    "catalog:sync": "pnpm --filter @atll/worker catalog:sync",
     "catalog:snapshot": "pnpm --filter @atll/worker catalog:snapshot",
     "catalog:restore": "pnpm --filter @atll/worker catalog:restore",
     "search:eval": "pnpm --filter @atll/worker search:eval",

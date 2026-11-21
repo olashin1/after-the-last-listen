@@ -2,6 +2,51 @@
 
 Open and settled decisions that aren't in `docs/prd.md`. Newest first.
 
+## 2026-11-21: Tracklist storage (decided with the user)
+
+- **Keep the PRD's middle ground:** tracklists load on demand and stay cached in `catalog.tracks`. A pre-warm job loads the most popular albums (about the top 50k) ahead of time.
+- **We don't store every album's tracklist.** It would be about 35M rows, roughly 5–6 GB with indexes (estimate), from a 7–21 GB dump. Every weekly sync would rewrite it, and most of it would never be viewed.
+- **Why pre-warm at all:** a MusicBrainz outage, like the 503s on 2026-11-21, leaves an album page without its tracklist. With pre-warming, nearly every page people open is instant and doesn't depend on MusicBrainz.
+- **Phase 3 follow-up:** if an album's tracklist isn't loaded, logging still works; the Shooting Star can be added later.
+
+## 2026-11-21: Catalog sync, merges, live search fallback
+
+- **One sync command, `pnpm catalog:sync`** (`packages/worker/src/sync.ts`). It runs the release-group upsert, then canonical releases, then lookups of vanished albums. Each step commits on its own, so a failure at any point leaves the previous catalog searchable (PRD §10). Runs are recorded in `catalog.sync_runs`. An advisory lock allows one sync at a time.
+- **Vanished albums:** active `dump` albums missing from a new dump go into `catalog.sync_vanished` in the same transaction as the upsert. Each is then looked up through the API, one at a time and outside that transaction:
+  - A different MBID back means a merge.
+  - A 404, or a type that's no longer Album or EP, means it's retired.
+  - Anything else is kept, because the dump was behind.
+  - At most 1500 lookups per run (2 s apart, about 50 minutes). The rest wait for the next run and stay searchable meanwhile.
+- **Safety guard:** the upsert rolls back if the dump has fewer than 95% of the active albums, or if more than 2% of them vanished. This protects against a truncated or wrong download.
+- **Albums back in a dump are un-retired**, unless they were merged.
+- **Merges** (`catalog.apply_album_redirect`):
+  - If the survivor is already in the catalog, the old row is retired and `merged_into_id` points at it. Chains are flattened, and the album page redirects (308).
+  - If the survivor isn't in the catalog, the old row takes the new MBID and keeps our ID.
+  - The redirect is recorded in `catalog.mbid_redirects` either way.
+  - **Open (Phase 3):** move `user_albums` and favorites from a merged album to its survivor, handling a user who logged both.
+- **`merged_into_id` is a deferrable foreign key** (checked at commit), so the data-only `catalog:restore` can load rows in any order.
+- **Live search fallback:**
+  - **When it runs:** when local search returns nothing, or its best `match` (word similarity, now returned by `search_albums`) is under `WEAK_MATCH`. Match is used rather than score, because popularity can push a poor text match high. The value and how it was chosen are below.
+  - **The search:** one MusicBrainz release-group search (Albums and EPs, limit 10). It's skipped when the same normalized query went to MusicBrainz in the last 7 days (`catalog.live_searches`), and when the adapter's queue wait is over 2.5 s.
+  - **What it stores:** results go into the catalog with `add_live_albums()` (service role only) as `source = 'live'`. Existing albums are never changed, and MBIDs merged away are skipped.
+  - **Provisional canonical release:** the first official release in the result, so the album page can load tracks straight away. The next canonical dump replaces it.
+  - **The page:** local results show immediately, and the MusicBrainz results stream in underneath. Failures show nothing extra.
+- **Fallback threshold `WEAK_MATCH = 0.8`** (`apps/web/lib/search.ts`), chosen with `pnpm search:eval`. 4 of the 50 test queries fall under it. Three are typos already ranked correctly (the lowest correct top-1 match is 0.61, and 10% of correct matches are under 0.88), and the fourth is the `mbdtf` miss. So about 8% of searches make at most one extra API call per query per week, and local results never wait for it. Revisit with real search logs and real new-release searches. No release newer than the dump was available on 2026-11-21 to test end to end.
+- **MusicBrainz was flaky on the first run** (503s and 10 s timeouts on about a fifth of lookups). Failed lookups stay queued and the fallback shows nothing extra, so neither is user-visible.
+- **Retries with backoff (added later the same day):** the adapter retries 502, 503 and 504 responses, timeouts and network errors. It waits 2 s, then 4 s, plus up to half that again at random, and allows 2 retries by default. The rate-limit docs (checked 2026-11-21) give no back-off advice and no `Retry-After` header; one is honoured, capped at 30 s, if it ever appears. Responses do carry undocumented `X-RateLimit-Limit` (1900), `X-RateLimit-Remaining` and `X-RateLimit-Reset` (about 1 s ahead) headers. That looks like a shared bucket refilled every second, which would explain 503s on well-spaced requests on busy days. Our waits already outlast its reset, so we don't read these headers. The live fallback uses `retries: 0`, because the searcher is waiting.
+- **The album page's tracklist streams in its own Suspense boundary**, so retries never hold up the cover, title or (in Phase 3) the logging form.
+- **`pnpm catalog:sync --lookups-only`** retries the queued vanished albums without downloading or loading dumps.
+- **Live albums aren't checked for vanishing**, because they may be newer than the dump. They become `dump` albums once a dump includes them. A live album that MusicBrainz later deletes stays active. That's rare and harmless, and can be revisited later.
+- **`/search` is now the real search page** (public, with a search box in the header). `DEBUG_TOOLS` only adds the score and match to each result.
+- **Schedule (decided with the user):** a GitHub Actions workflow, `.github/workflows/catalog-sync.yml`, runs every Sunday at 06:00 UTC (after the Saturday JSON dump) and on demand. It's inactive until the `CATALOG_DATABASE_URL` secret is set, which needs a hosted project. Use the session pooler: runners are IPv4-only, and the advisory lock needs a session.
+
+## 2026-11-21: Phase 2 plan, shared MusicBrainz adapter
+
+- **Plan (decided with the user):** MBID redirects come from API lookups of only the albums that vanish from a new dump (the JSON dumps have no redirects, and the docs don't confirm that the 7 GB Postgres dump has them). The weekly sync runs as a GitHub Actions cron, inactive until a hosted database exists.
+- **The adapter is now a workspace package, `packages/musicbrainz`**, so the sync worker can call the API too. `createMusicBrainzClient({ minIntervalMs })` gives each process its own queue. The web app's client (`apps/web/lib/musicbrainz.ts`) spaces requests 1.1 s apart, the same as before. The track mapper moved with it. The web app loads the package through `transpilePackages` and `allowImportingTsExtensions`. The worker runs it with type stripping (Node resolves the workspace symlink, so the files aren't under `node_modules`).
+- **Fail fast when busy:** `get(..., { maxQueueWaitMs })` throws `MusicBrainzBusy` without sending anything when the queue wait would be longer than that. It's for the live search fallback, so a search never waits behind a queue.
+- **Worker and web share one IP limit.** Their queues are separate, so the worker's redirect lookups use a 2 s interval. That keeps the two together at about 1 request per second.
+
 ## 2026-11-21: Album page, cover art, tracklists
 
 - **Canonical edition (decided with the user):** each album shows the tracklist of MusicBrainz's canonical release, from the canonical data dump (`canonical/canonical_release_redirect.csv`, CC0, refreshed on the 1st and 15th). `pnpm catalog:canonical` loads it into `catalog.albums.canonical_release_mbid`. The archive is 2.4 GB `.tar.zst`; the system `tar` must read zstd (Windows' built-in `tar.exe` does; Git Bash's GNU tar needs a separate `zstd`).

@@ -6,7 +6,7 @@ select plan(42);
 select has_schema('catalog', 'catalog schema exists');
 select tables_are(
   'catalog',
-  array['artists', 'albums', 'album_artists', 'mbid_redirects', 'tracks'],
+  array['artists', 'albums', 'album_artists', 'mbid_redirects', 'tracks', 'sync_runs', 'sync_vanished', 'live_searches'],
   'catalog has exactly the expected tables'
 );
 select is(

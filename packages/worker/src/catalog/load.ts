@@ -2,7 +2,10 @@
 // upsert everything in the same transaction, so search never sees a half-loaded catalog (PRD §7).
 // Re-running with the same dump changes nothing: upserts skip rows whose values are unchanged.
 //
-// Not done here (Phase 2 sync worker): retiring albums that disappeared upstream, MBID redirects.
+// With `vanished` (the weekly sync), it also records active albums missing from the dump in
+// catalog.sync_vanished for an API lookup (merge, deletion or dump lag; see catalog/vanished.ts).
+// A safety guard aborts the whole transaction if the dump looks truncated, so a bad download can't
+// retire the catalog: the previous catalog stays as it was and search keeps working.
 
 import { once } from "node:events";
 import type { MappedAlbum } from "../musicbrainz/map.ts";
@@ -17,7 +20,41 @@ export type LoadCounts = {
   creditsRemoved: number;
   creditsAdded: number;
   popularityChanged: number;
+  /** Albums back in the dump: un-retired (unless merged), or live albums now confirmed by the dump. */
+  reactivated: number;
+  /** Active albums missing from the dump, queued for lookup (only with `vanished`). */
+  vanished: number;
 };
+
+export type VanishedOptions = {
+  runId: number;
+  /** Abort unless the dump has at least this share of the currently active albums (default 0.95). */
+  minDumpShare?: number;
+  /** Abort if more than this share of active albums vanished (default 0.02). */
+  maxVanishedShare?: number;
+};
+
+export class DumpGuardError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "DumpGuardError";
+  }
+}
+
+/** Pure guard check, so it can be unit-tested. Returns the reason to abort, or null. */
+export function dumpGuardFailure(
+  { activeBefore, staged, vanished }: { activeBefore: number; staged: number; vanished: number | null },
+  { minDumpShare = 0.95, maxVanishedShare = 0.02 }: Pick<VanishedOptions, "minDumpShare" | "maxVanishedShare"> = {},
+): string | null {
+  if (activeBefore === 0) return null; // Empty catalog: the first import.
+  if (staged < activeBefore * minDumpShare) {
+    return `dump has ${staged.toLocaleString()} albums, under ${minDumpShare * 100}% of the ${activeBefore.toLocaleString()} active ones`;
+  }
+  if (vanished !== null && vanished > activeBefore * maxVanishedShare) {
+    return `${vanished.toLocaleString()} active albums are missing from the dump, over ${maxVanishedShare * 100}% of ${activeBefore.toLocaleString()}`;
+  }
+  return null;
+}
 
 /** Phase 1 popularity proxy: log of the URL link count, scaled so 50+ links is 1.0. */
 export const POPULARITY_SQL = "least(1.0, ln(1 + link_count) / ln(51))";
@@ -26,8 +63,13 @@ export async function loadAlbums(
   sql: Sql,
   albums: AsyncIterable<MappedAlbum>,
   log: (msg: string) => void,
+  { vanished }: { vanished?: VanishedOptions } = {},
 ): Promise<LoadCounts> {
   return sql.begin(async (tx) => {
+    const [{ active_before: activeBefore }] = (await tx`
+      select count(*)::int as active_before from catalog.albums where not retired
+    `) as unknown as [{ active_before: number }];
+
     await tx`
       create temp table stg_albums (
         mbid uuid not null,
@@ -73,6 +115,10 @@ export async function loadAlbums(
     stream.end();
     await done;
     log(`Staged ${staged.toLocaleString()} albums. Upserting…`);
+    if (vanished) {
+      const failure = dumpGuardFailure({ activeBefore, staged, vanished: null }, vanished);
+      if (failure) throw new DumpGuardError(`Dump looks truncated, nothing changed: ${failure}`);
+    }
 
     await tx`create index on stg_albums (mbid)`;
     await tx`analyze stg_albums`;
@@ -145,6 +191,39 @@ export async function loadAlbums(
     `;
     log(`Credits: ${deleted.count.toLocaleString()} removed, ${inserted.count.toLocaleString()} added.`);
 
+    // Back in the dump: un-retire (a merged album stays merged), and live albums become dump albums.
+    const reactivated = await tx`
+      update catalog.albums a
+      set retired = case when a.merged_into_id is null then false else a.retired end, source = 'dump'
+      from stg_albums s
+      where a.mbid = s.mbid
+        and ((a.retired and a.merged_into_id is null) or a.source = 'live')
+    `;
+    log(`Reactivated: ${reactivated.count.toLocaleString()} albums back in the dump.`);
+
+    let vanishedCount = 0;
+    if (vanished) {
+      // Earlier lookups still pending for albums that are back: drop them.
+      await tx`
+        delete from catalog.sync_vanished v
+        using catalog.albums a, stg_albums s
+        where v.album_id = a.id and a.mbid = s.mbid
+      `;
+      // Live albums aren't checked: they may be newer than the dump.
+      const missing = await tx`
+        insert into catalog.sync_vanished (album_id, run_id)
+        select a.id, ${vanished.runId}
+        from catalog.albums a
+        where not a.retired and a.source = 'dump'
+          and not exists (select 1 from stg_albums s where s.mbid = a.mbid)
+        on conflict (album_id) do update set run_id = excluded.run_id
+      `;
+      vanishedCount = missing.count;
+      const failure = dumpGuardFailure({ activeBefore, staged, vanished: vanishedCount }, vanished);
+      if (failure) throw new DumpGuardError(`Too many albums vanished, nothing changed: ${failure}`);
+      log(`Vanished: ${vanishedCount.toLocaleString()} active albums missing from the dump, queued for lookup.`);
+    }
+
     const popularity = await tx.unsafe(`
       update catalog.albums set popularity = ${POPULARITY_SQL}
       where popularity is distinct from ${POPULARITY_SQL}
@@ -158,6 +237,8 @@ export async function loadAlbums(
       creditsRemoved: deleted.count,
       creditsAdded: inserted.count,
       popularityChanged: popularity.count,
+      reactivated: reactivated.count,
+      vanished: vanishedCount,
     };
   });
 }

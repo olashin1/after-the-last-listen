@@ -1,0 +1,65 @@
+# Weekly catalog sync (PRD §7 "Refresh: weekly full refresh"): `pnpm catalog:sync` against the
+# hosted database. MusicBrainz publishes JSON dumps on Wednesdays and Saturdays, so Sunday picks up
+# the Saturday dump. See packages/worker/README.md ("Scheduled sync") for setup.
+#
+# Inactive until the repository secret CATALOG_DATABASE_URL is set (the Supabase session pooler
+# URL; GitHub runners are IPv4-only). Without it the job logs a notice and does nothing.
+
+name: Catalog sync
+
+on:
+  schedule:
+    - cron: "0 6 * * 0" # Sundays 06:00 UTC
+  workflow_dispatch:
+    inputs:
+      max_lookups:
+        description: "Most MusicBrainz lookups of vanished albums this run"
+        default: "1500"
+
+# Never two syncs at once (the worker also takes an advisory lock).
+concurrency:
+  group: catalog-sync
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      DATABASE_URL: ${{ secrets.CATALOG_DATABASE_URL }}
+    steps:
+      - name: Check configuration
+        id: config
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::notice::CATALOG_DATABASE_URL is not set; skipping the catalog sync."
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.config.outputs.enabled == 'true'
+
+      - uses: pnpm/action-setup@v4
+        if: steps.config.outputs.enabled == 'true'
+
+      - uses: actions/setup-node@v4
+        if: steps.config.outputs.enabled == 'true'
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        if: steps.config.outputs.enabled == 'true'
+        run: pnpm install --frozen-lockfile --filter @atll/worker...
+
+      # The canonical dump is .tar.zst; the runner's GNU tar reads it through zstd.
+      - name: Sync
+        if: steps.config.outputs.enabled == 'true'
+        env:
+          MAX_LOOKUPS: ${{ inputs.max_lookups || '1500' }}
+        run: pnpm catalog:sync --allow-remote --max-lookups "$MAX_LOOKUPS"
