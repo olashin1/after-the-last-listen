@@ -38,7 +38,7 @@ Done when: a user can reliably find and inspect an album, including new releases
 - [x] Debug search page `/search` behind `DEBUG_TOOLS=true`: results with covers, type and score, linking to album pages
 - [x] Seeded local test accounts on every reset: `alice@demo.test` (public) and `bob@demo.test` (private), password `password123` (`supabase/seed.sql`)
 - [x] Migration workflow: `migration up` while developing; `db:reset` + `pnpm check` before committing or merging (CLAUDE.md)
-- [ ] Catalog snapshot and restore (`pnpm catalog:snapshot` / `pnpm catalog:restore`): built, but the first snapshot and a full reset-and-restore test haven't been run yet
+- [x] Catalog snapshot and restore (`pnpm catalog:snapshot` / `pnpm catalog:restore`): snapshot 40 s (293 MB), reset 34 s, restore about 6 min, versus about 22 min to re-import; tested 2026-11-21 (albums, canonical releases, credits, loaded tracks, seeded accounts and search all came back)
 
 ## Phase 3: Core logging (not started)
 

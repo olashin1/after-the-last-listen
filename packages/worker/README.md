@@ -45,7 +45,7 @@ pnpm catalog:canonical --folder musicbrainz-canonical-dump-20261117-080003
 
 ## Snapshot and restore
 
-A full import takes about 25 minutes (catalog plus canonical releases); restoring a snapshot is much faster.
+A full import takes 20–25 minutes (catalog plus canonical releases). A snapshot takes about 40 seconds (293 MB) and restores in about 6 minutes.
 
 ```
 pnpm catalog:snapshot   # after an import: save the catalog to .cache/catalog/catalog.dump

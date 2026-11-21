@@ -51,7 +51,7 @@ Run from the repo root. The Supabase CLI is a devDependency, so call it as `pnpm
 - Lint / typecheck: `pnpm lint` / `pnpm typecheck` (all workspaces)
 - Unit tests (Vitest): `pnpm test` (all workspaces)
 - Everything before saying a task is done: `pnpm check`
-- Catalog: `pnpm catalog:import` (MusicBrainz release groups, ~10 min), then `pnpm catalog:canonical` (canonical releases, ~8 min). `pnpm catalog:snapshot` / `pnpm catalog:restore` save and restore the imported catalog around resets. Details: `packages/worker/README.md`.
+- Catalog: `pnpm catalog:import` (MusicBrainz release groups, ~10 min), then `pnpm catalog:canonical` (canonical releases, ~8 min). `pnpm catalog:snapshot` (~40 s) / `pnpm catalog:restore` (~6 min) save and restore the imported catalog around resets. Details: `packages/worker/README.md`.
 - Search accuracy: `pnpm search:eval` (test searches in `packages/worker/search-eval/queries.json`). In PowerShell, quote weights: `--weights "1,0.15,0.1"`.
 
 Local test accounts (seeded on every reset): `alice@demo.test` / `password123` (public) and `bob@demo.test` / `password123` (private). See `docs/testing.md`.
