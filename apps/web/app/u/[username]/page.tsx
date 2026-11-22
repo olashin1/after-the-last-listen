@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Avatar } from "@/components/avatar";
+import { ProfileNav } from "@/components/profile-nav";
 import { getCurrentProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -15,7 +16,7 @@ async function Profile({ params }: { params: PageProps<"/u/[username]">["params"
   if (!profile) notFound();
 
   const isOwner = me?.user_id === profile.user_id;
-  // The card is always visible (docs/decisions.md). Collection and diary will check can_view_user_content().
+  // The card is always visible (docs/decisions.md). Albums and diary are hidden by RLS (can_view_user_content).
   const contentHidden = profile.visibility === "private" && !isOwner;
 
   return (
@@ -27,6 +28,7 @@ async function Profile({ params }: { params: PageProps<"/u/[username]">["params"
           <p className="text-zinc-500">@{profile.username}</p>
         </div>
       </header>
+      <ProfileNav username={profile.username} current="profile" />
       {profile.bio && <p className="whitespace-pre-line">{profile.bio}</p>}
       {isOwner && (
         <p className="text-sm">

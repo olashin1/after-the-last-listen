@@ -1,11 +1,18 @@
 import { notFound, permanentRedirect } from "next/navigation";
 import { Suspense } from "react";
+import Link from "next/link";
 import { AlbumCover } from "@/components/album-cover";
+import { LogButton } from "@/components/log/log-dialog";
+import { RatingStars, ShootingStarLabel } from "@/components/rating-stars";
 import { type Album as AlbumRow, getAlbum, getTracklist } from "@/lib/album";
+import { getCurrentProfile } from "@/lib/auth";
+import { getUserAlbum } from "@/lib/collection";
+import { formatListenDate } from "@/lib/dates";
 import { formatDuration } from "@atll/musicbrainz";
 
 // Album page (PRD Phase 2 "find and inspect an album"): cover, title, then the canonical release's
-// tracklist from the first track to the last. Logging (Phase 3) will be added here.
+// tracklist from the first track to the last. Signed in, its Log button opens the Log dialog on this
+// album, and "Your log" shows the user's rating, review and Shooting Star (highlighted in the tracklist).
 // The tracklist streams in its own Suspense boundary: loading it may wait on MusicBrainz (with
 // retries), and that must never hold up the rest of the page.
 
@@ -34,6 +41,10 @@ async function Album({ params }: { params: PageProps<"/album/[id]">["params"] })
         </div>
       </header>
 
+      <Suspense fallback={null}>
+        <YourLog album={album} />
+      </Suspense>
+
       <Suspense fallback={<p className="text-sm text-zinc-500">Loading tracklist…</p>}>
         <Tracklist album={album} />
       </Suspense>
@@ -49,8 +60,59 @@ async function Album({ params }: { params: PageProps<"/album/[id]">["params"] })
   );
 }
 
+/** The Log button, and the signed-in user's entry for this album when they've logged it. */
+async function YourLog({ album }: { album: AlbumRow }) {
+  const profile = await getCurrentProfile();
+  if (!profile) {
+    return (
+      <p className="text-center text-sm">
+        <Link href={`/sign-in?next=/album/${album.id}`} className="font-medium text-violet-700 underline dark:text-violet-400">
+          Sign in to log this album
+        </Link>
+      </p>
+    );
+  }
+
+  const entry = await getUserAlbum(album.id);
+  if (!entry) {
+    return (
+      <div className="flex justify-center">
+        <LogButton albumId={album.id} className="rounded-md bg-violet-600 px-5 py-2 font-medium text-white hover:bg-violet-700">
+          Log +
+        </LogButton>
+      </div>
+    );
+  }
+
+  const rating = entry.rating === null ? null : Number(entry.rating);
+  return (
+    <section aria-labelledby="your-log-heading" className="flex flex-col gap-3 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
+      <div className="flex items-center justify-between gap-3">
+        <h2 id="your-log-heading" className="font-semibold">Your log</h2>
+        <div className="flex items-center gap-3">
+          <LogButton albumId={album.id} mode="edit" className="text-sm text-zinc-600 underline dark:text-zinc-400">
+            Edit
+          </LogButton>
+          <LogButton albumId={album.id} className="rounded-md bg-violet-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-violet-700">
+            Log again +
+          </LogButton>
+        </div>
+      </div>
+      {rating !== null ? <RatingStars rating={rating} size={20} /> : <p className="text-sm text-zinc-500">Unrated</p>}
+      {entry.shooting_star_title && <ShootingStarLabel title={entry.shooting_star_title} />}
+      {entry.review && <p className="whitespace-pre-line break-words">{entry.review}</p>}
+      <p className="text-xs text-zinc-500">
+        {entry.listen_count === 1
+          ? `Listened ${formatListenDate(entry.first_listened_on)}`
+          : `Listened ${entry.listen_count} times · first ${formatListenDate(entry.first_listened_on)} · last ${formatListenDate(entry.last_listened_on)}`}
+      </p>
+    </section>
+  );
+}
+
 async function Tracklist({ album }: { album: AlbumRow }) {
-  const { tracks, status } = await getTracklist(album);
+  const [{ tracks, status }, entry] = await Promise.all([getTracklist(album), getUserAlbum(album.id)]);
+  const star = entry?.shooting_star_recording_mbid ?? null;
   const discs = new Set(tracks.map((t) => t.disc_number)).size;
   const totalMs = tracks.every((t) => t.length_ms !== null) ? tracks.reduce((sum, t) => sum + (t.length_ms ?? 0), 0) : null;
 
@@ -79,9 +141,21 @@ async function Tracklist({ album }: { album: AlbumRow }) {
                     Disc {t.disc_number}
                   </span>
                 )}
-                <span className="flex items-baseline gap-3 border-b border-zinc-200 py-2 dark:border-zinc-800">
+                <span
+                  className={`flex items-baseline gap-3 border-b border-zinc-200 py-2 dark:border-zinc-800 ${
+                    t.recording_mbid === star ? "-mx-2 rounded bg-amber-50 px-2 dark:bg-amber-950/30" : ""
+                  }`}
+                >
                   <span className="w-6 shrink-0 text-right text-sm text-zinc-400 tabular-nums">{t.position}</span>
-                  <span className="min-w-0 flex-1 break-words">{t.title}</span>
+                  <span className="min-w-0 flex-1 break-words">
+                    {t.title}
+                    {t.recording_mbid === star && (
+                      <span className="ml-2 text-amber-600 dark:text-amber-400">
+                        <span aria-hidden>★</span>
+                        <span className="sr-only">(your Shooting Star)</span>
+                      </span>
+                    )}
+                  </span>
                   <span className="shrink-0 text-sm text-zinc-500 tabular-nums">{formatDuration(t.length_ms)}</span>
                 </span>
               </li>
