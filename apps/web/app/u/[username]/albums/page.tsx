@@ -40,17 +40,17 @@ async function Grid({ username, isOwner, cursor }: { username: string; isOwner: 
 
   if (items.length === 0 && !cursor) {
     return (
-      <div className="flex flex-col items-center gap-4 rounded-lg border border-dashed border-zinc-300 px-6 py-12 text-center dark:border-zinc-700">
+      <div className="flex flex-col items-center gap-4 rounded-lg border border-dashed border-plum-300 px-6 py-12 text-center dark:border-plum-700">
         <p className="text-lg font-medium">No logs yet</p>
         {isOwner ? (
           <>
-            <p className="text-sm text-zinc-500">Albums you log show up here, with your rating and Shooting Star.</p>
-            <LogButton className="rounded-md bg-violet-600 px-4 py-2 font-medium text-white hover:bg-violet-700">
+            <p className="text-sm text-plum-500">Albums you log show up here, with your rating and Shooting Star.</p>
+            <LogButton className="rounded-md bg-iris-600 px-4 py-2 font-medium text-white hover:bg-iris-700">
               Log your first album +
             </LogButton>
           </>
         ) : (
-          <p className="text-sm text-zinc-500">@{username} hasn&apos;t logged any albums yet.</p>
+          <p className="text-sm text-plum-500">@{username} hasn&apos;t logged any albums yet.</p>
         )}
       </div>
     );
@@ -69,8 +69,8 @@ async function Grid({ username, isOwner, cursor }: { username: string; isOwner: 
                   <AlbumCover mbid={item.mbid} title={item.title} size={200} />
                 </span>
                 <span className="text-sm font-medium leading-snug break-words group-hover:underline">{item.title}</span>
-                <span className="-mt-1 text-xs text-zinc-500 break-words">{item.artist_credit || "Unknown artist"}</span>
-                <RatingStars rating={rating} size={14} />
+                <span className="-mt-1 text-xs text-plum-500 break-words">{item.artist_credit || "Unknown artist"}</span>
+                <RatingStars rating={rating} size={21} />
                 {item.shooting_star_title && <ShootingStarLabel title={item.shooting_star_title} className="text-xs" />}
               </Link>
             </li>
@@ -92,7 +92,7 @@ async function Grid({ username, isOwner, cursor }: { username: string; isOwner: 
 export default function AlbumsPage(props: PageProps<"/u/[username]/albums">) {
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-4 py-12">
-      <Suspense fallback={<p className="text-sm text-zinc-500">Loading albums…</p>}>
+      <Suspense fallback={<p className="text-sm text-plum-500">Loading albums…</p>}>
         <Albums {...props} />
       </Suspense>
     </main>

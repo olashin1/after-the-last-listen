@@ -61,7 +61,7 @@ export function AlbumSearch({ onPick }: { onPick: (albumId: number) => void }) {
         autoFocus
         className={`${inputClass} w-full`}
       />
-      <p className="text-sm text-zinc-500" aria-live="polite">
+      <p className="text-sm text-plum-500" aria-live="polite">
         {query.length < 2
           ? "Type at least two letters."
           : state.status === "searching" || !showing
@@ -75,18 +75,18 @@ export function AlbumSearch({ onPick }: { onPick: (albumId: number) => void }) {
                   : null}
       </p>
       {showing && state.results.length > 0 && (
-        <ul className="flex flex-col divide-y divide-zinc-200 dark:divide-zinc-800">
+        <ul className="flex flex-col divide-y divide-plum-200 dark:divide-plum-800">
           {state.results.map((r) => (
             <li key={r.id}>
               <button
                 type="button"
                 onClick={() => onPick(r.id)}
-                className="flex w-full items-center gap-3 rounded py-2 text-left hover:bg-zinc-50 focus-visible:bg-zinc-50 dark:hover:bg-zinc-800 dark:focus-visible:bg-zinc-800"
+                className="flex w-full items-center gap-3 rounded py-2 text-left hover:bg-plum-50 focus-visible:bg-plum-50 dark:hover:bg-plum-800 dark:focus-visible:bg-plum-800"
               >
                 <AlbumCover mbid={r.mbid} title={r.title} size={44} />
                 <span className="flex min-w-0 flex-1 flex-col">
                   <span className="font-medium break-words">{r.title}</span>
-                  <span className="text-sm text-zinc-500 break-words">
+                  <span className="text-sm text-plum-500 break-words">
                     {r.artist}
                     {r.detail && ` · ${r.detail}`}
                   </span>

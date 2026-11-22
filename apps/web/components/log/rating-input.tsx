@@ -3,7 +3,7 @@
 import { Star } from "@/components/rating-stars";
 import { ratingFromStar, ratingLabel, starFill, stepRating } from "@/lib/rating";
 
-const SIZE = 32;
+const SIZE = 48;
 
 /**
  * Half-star rating input. One slider (arrow keys move half a star, Home/End jump, Delete clears);
@@ -43,7 +43,7 @@ export function RatingInput({ value, onChange }: { value: number | null; onChang
         aria-valuenow={value ?? undefined}
         aria-valuetext={value === null ? "Unrated" : ratingLabel(value)}
         onKeyDown={onKeyDown}
-        className="flex cursor-pointer rounded outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
+        className="flex cursor-pointer rounded outline-none focus-visible:ring-2 focus-visible:ring-iris-500"
       >
         {[1, 2, 3, 4, 5].map((s) => (
           <span key={s} onClick={(e) => onStarClick(s, e)} className="px-0.5">
@@ -51,9 +51,9 @@ export function RatingInput({ value, onChange }: { value: number | null; onChang
           </span>
         ))}
       </div>
-      <span className="w-16 text-sm text-zinc-500 tabular-nums">{value === null ? "Unrated" : value}</span>
+      <span className="w-16 text-sm text-plum-500 tabular-nums">{value === null ? "Unrated" : value}</span>
       {value !== null && (
-        <button type="button" onClick={() => onChange(null)} className="text-sm text-zinc-500 underline">
+        <button type="button" onClick={() => onChange(null)} className="text-sm text-plum-500 underline">
           Clear
         </button>
       )}

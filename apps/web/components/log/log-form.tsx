@@ -5,6 +5,7 @@ import { getLogContext, logAlbum, updateEntry, type LogContext } from "@/app/log
 import { AlbumCover } from "@/components/album-cover";
 import { inputClass } from "@/components/form";
 import { localIsoDate } from "@/lib/dates";
+import { ShootingStarIcon } from "@/components/rating-stars";
 import { RatingInput } from "./rating-input";
 
 const REVIEW_MAX = 5000;
@@ -38,7 +39,7 @@ export function LogForm({
     };
   }, [albumId]);
 
-  if (!context) return <p className="text-sm text-zinc-500">Loading album…</p>;
+  if (!context) return <p className="text-sm text-plum-500">Loading album…</p>;
   if ("error" in context) {
     return (
       <div className="flex flex-col items-start gap-3">
@@ -52,7 +53,7 @@ export function LogForm({
 
 function BackButton({ onClick }: { onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} className="self-start text-sm text-zinc-500 underline">
+    <button type="button" onClick={onClick} className="self-start text-sm text-plum-500 underline">
       ← Back to search
     </button>
   );
@@ -103,12 +104,12 @@ function Form({
         <AlbumCover mbid={album.mbid} title={album.title} size={64} />
         <div className="flex min-w-0 flex-col">
           <span className="font-semibold break-words">{album.title}</span>
-          <span className="text-sm text-zinc-500 break-words">
+          <span className="text-sm text-plum-500 break-words">
             {album.artist}
             {album.year && ` · ${album.year}`}
           </span>
           {entry && mode === "log" && (
-            <span className="text-xs text-zinc-500">
+            <span className="text-xs text-plum-500">
               In your albums · logged {entry.listenCount} time{entry.listenCount === 1 ? "" : "s"}. This adds another listen.
             </span>
           )}
@@ -131,12 +132,12 @@ function Form({
       )}
 
       <div className="flex flex-col gap-1 text-sm">
-        <span className="font-medium" id="rating-label">Rating <span className="font-normal text-zinc-500">(optional)</span></span>
+        <span className="font-medium" id="rating-label">Rating <span className="font-normal text-plum-500">(optional)</span></span>
         <RatingInput value={rating} onChange={setRating} />
       </div>
 
       <label className="flex flex-col gap-1 text-sm">
-        <span className="font-medium">Review <span className="font-normal text-zinc-500">(optional)</span></span>
+        <span className="font-medium">Review <span className="font-normal text-plum-500">(optional)</span></span>
         <textarea
           value={review}
           onChange={(e) => setReview(e.target.value)}
@@ -145,17 +146,17 @@ function Form({
           className={inputClass}
         />
         {review.length > REVIEW_MAX - 500 && (
-          <span className="text-xs text-zinc-500">{review.length} / {REVIEW_MAX}</span>
+          <span className="text-xs text-plum-500">{review.length} / {REVIEW_MAX}</span>
         )}
       </label>
 
       <fieldset className="flex flex-col gap-1 text-sm">
-        <legend className="mb-1 font-medium">
-          <span className="text-amber-600 dark:text-amber-400" aria-hidden>★ </span>
-          Shooting Star <span className="font-normal text-zinc-500">(optional: your favorite track)</span>
+        <legend className="mb-1 flex items-center gap-1.5 font-medium">
+          <ShootingStarIcon />
+          Shooting Star <span className="font-normal text-plum-500">(optional: your favorite track)</span>
         </legend>
         {tracks.length === 0 && !starMissing && (
-          <p className="text-zinc-500">
+          <p className="text-plum-500">
             {tracksStatus === "no_release"
               ? "There's no tracklist for this album yet."
               : "The tracklist isn't available right now."}{" "}
@@ -163,7 +164,7 @@ function Form({
           </p>
         )}
         {(tracks.length > 0 || starMissing) && (
-          <div className="flex max-h-64 flex-col overflow-y-auto rounded-md border border-zinc-200 dark:border-zinc-800">
+          <div className="flex max-h-64 flex-col overflow-y-auto rounded-md border border-plum-200 dark:border-plum-800">
             <StarOption checked={star === null} onChange={() => setStar(null)} label="None" />
             {starMissing && entry?.shootingStarTitle && (
               <StarOption checked onChange={() => setStar(entry.shootingStarMbid)} label={entry.shootingStarTitle} />
@@ -187,7 +188,7 @@ function Form({
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-violet-600 px-4 py-2 font-medium text-white hover:bg-violet-700 disabled:opacity-60"
+          className="rounded-md bg-iris-600 px-4 py-2 font-medium text-white hover:bg-iris-700 disabled:opacity-60"
         >
           {pending ? "Saving…" : mode === "edit" ? "Save changes" : "Save log"}
         </button>
@@ -199,14 +200,14 @@ function Form({
 function StarOption({ checked, onChange, label, number }: { checked: boolean; onChange: () => void; label: string; number?: string }) {
   return (
     <label
-      className={`flex cursor-pointer items-baseline gap-3 border-b border-zinc-100 px-3 py-2 last:border-b-0 dark:border-zinc-800 ${
-        checked ? "bg-amber-50 dark:bg-amber-950/30" : "hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+      className={`flex cursor-pointer items-baseline gap-3 border-b border-plum-100 px-3 py-2 last:border-b-0 dark:border-plum-800 ${
+        checked ? "bg-star-50 dark:bg-star-950/30" : "hover:bg-plum-50 dark:hover:bg-plum-800/50"
       }`}
     >
-      <input type="radio" name="shooting-star" checked={checked} onChange={onChange} className="accent-amber-500" />
-      {number !== undefined && <span className="w-8 shrink-0 text-right text-zinc-400 tabular-nums">{number}</span>}
+      <input type="radio" name="shooting-star" checked={checked} onChange={onChange} className="accent-star-500" />
+      {number !== undefined && <span className="w-8 shrink-0 text-right text-plum-400 tabular-nums">{number}</span>}
       <span className="min-w-0 flex-1 break-words">{label}</span>
-      {checked && number !== undefined && <span className="text-amber-600 dark:text-amber-400" aria-hidden>★</span>}
+      {checked && number !== undefined && <ShootingStarIcon />}
     </label>
   );
 }

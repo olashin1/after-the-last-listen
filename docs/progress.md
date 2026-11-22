@@ -74,7 +74,7 @@ Done when: a repeat album appears several times in the diary but once in the col
 - [ ] Turn on the weekly sync: set `CATALOG_DATABASE_URL` (session pooler) once the hosted project exists, then run it once by hand from the Actions tab
 - [ ] Phase 5: move favorites from a merged album to its survivor in `apply_album_redirect()` (`user_albums` move in Phase 3; see `docs/decisions.md`)
 - [ ] MusicBrainz and Cover Art Archive attribution site-wide, and confirm the Cover Art Archive terms (see `docs/decisions.md`)
-- [ ] MusicBrainz adapter: shared rate limit across server instances before deploying (see `docs/decisions.md`, 2026-11-21)
+- [ ] MusicBrainz adapter: shared rate limit across server instances before deploying (see `docs/decisions.md`, 2026-11-21; try a Postgres-based limiter before Redis, see "No Redis for now")
 - [ ] Avatar cleanup job for orphaned files; switch avatars to `next/image` with `remotePatterns` (see `docs/decisions.md`, 2026-11-20)
 - [ ] Hosted Supabase: email confirmation on, minimum password length 8, the `supabase/templates/` email templates, site URL and redirect URLs (see `docs/decisions.md`)
 
@@ -86,6 +86,7 @@ Done when: core workflows work on desktop and mobile web for multiple accounts; 
 - [ ] Shooting Stars view
 - [ ] Empty states
 - [ ] Visual design pass: give every page and empty space (starting with the landing page) a polished look with pictures, music-themed visuals and intentional spacing
+  - [x] Soft purple colour scheme (light and dark) and bigger, rounded stars (2026-11-21, branch `feat/design-purple`)
 - [ ] Responsive design
 - [ ] Privacy toggle
 - [ ] Popularity from ListenBrainz

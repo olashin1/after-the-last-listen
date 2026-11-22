@@ -35,7 +35,7 @@ export function SignUpForm() {
       </Field>
       <FormMessage state={state} />
       <SubmitButton pending={pending}>Create account</SubmitButton>
-      <p className="text-sm text-zinc-500">
+      <p className="text-sm text-plum-500">
         Already have an account? <Link href="/sign-in" className="underline">Sign in</Link>
       </p>
     </form>
@@ -56,7 +56,7 @@ export function SignInForm({ next }: { next?: string }) {
       </Field>
       <FormMessage state={state} />
       <SubmitButton pending={pending}>Sign in</SubmitButton>
-      <p className="flex justify-between text-sm text-zinc-500">
+      <p className="flex justify-between text-sm text-plum-500">
         <Link href="/forgot-password" className="underline">Forgot password?</Link>
         <Link href="/sign-up" className="underline">Create an account</Link>
       </p>

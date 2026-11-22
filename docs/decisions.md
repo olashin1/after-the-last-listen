@@ -2,6 +2,33 @@
 
 Open and settled decisions that aren't in `docs/prd.md`. Newest first.
 
+## 2026-11-21: Purple colour scheme and rounded stars (decided with the user)
+
+- **Soft purples, light and dark,** following the system setting. The palettes are Tailwind v4 `@theme` tokens in `apps/web/app/globals.css`:
+  - `plum`: muted purple-greys for text, borders and surfaces. It replaced Tailwind's `zinc` everywhere.
+  - `iris`: a softer violet accent for buttons, focus rings, rating stars and the active tab. It replaced `violet`.
+  - `star`: a muted gold, **kept for the Shooting Star** so it stands apart from rating stars. It replaced `amber`.
+  - Red (errors) and green (success) are unchanged.
+- **Page colours:** light is `#faf8fd` with `#241b33` text, dark is `#16121e` with `#ece6f5`. `color-scheme` and `accent-color` make native controls (radios, scrollbars, the date picker) match. The body now uses the Geist font the layout loads, instead of the starter's Arial.
+- **Stars:** every star is one SVG (`components/star-icon.tsx`), a five-point polygon stroked in its own colour with round joins, so the points are rounded. Rating stars are 1.5× bigger:
+  - log form: 48 px
+  - album page: 30 px
+  - My Albums and diary: 21 px
+  - default: 24 px
+- **Shooting Star markers** use the same shape in gold, at 1.5× the text size.
+- **Header:** search, My Albums and Log +, then the account menu at the far right: your avatar and @username open a small menu with Profile, Diary, Settings and Sign out (`components/account-menu.tsx`). It closes on Escape or a click outside. On narrow screens only the avatar shows.
+- **Branch:** `feat/design-purple`, stacked on `feat/phase-3-logging` (PR #7).
+
+## 2026-11-21: No Redis for now
+
+- **Asked:** would Redis make the web app faster? **No, not today.** Where time goes:
+  - **Search** (`search_albums`, p50 122 ms, p95 913 ms): a result cache would only help repeated identical queries, and search-as-you-type sends many distinct ones. The slow cases are long multi-word queries, which need query or index work.
+  - **Tracklists:** already cached in Postgres (`catalog.tracks`); pre-warming (Phase 5) removes the cold misses.
+  - **Album, collection and diary reads** are small indexed queries that Postgres keeps in memory. Caching private data in Redis would also move the privacy checks (RLS) out of the database.
+  - **Cover art** is cached by the browser, and auth uses Supabase JWTs. Neither would gain anything.
+- **The one real candidate is the shared MusicBrainz rate limit** across server instances (a before-launch item). That's about staying within MusicBrainz's limit, not speed. Try a Postgres-based limiter first (one row handing out the next allowed send time); use a hosted Redis such as Upstash only if that falls short.
+- **Performance work that would help instead:** bring search p95 toward the PRD's 200 ms, pre-warm tracklists, and store "last listened" on `user_albums` if My Albums gets slow.
+
 ## 2026-11-21: Logging UI and My Albums (decided with the user)
 
 - **A purple "Log +" button** sits at the right of the header when you're signed in. It opens one app-wide pop-up (a native `<dialog>` in the root layout, `components/log/log-dialog.tsx`): first a search (debounced 300 ms, local search plus the live MusicBrainz fallback when results are weak), then the log form. **An album page has its own Log button** that opens the form straight on that album. "Edit" opens the same form without a date and doesn't add a listen.

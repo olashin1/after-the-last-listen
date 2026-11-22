@@ -42,7 +42,7 @@ export function AlbumCover({
         role="img"
         aria-label={`No cover for ${title}`}
         style={box}
-        className="flex shrink-0 items-center justify-center rounded bg-zinc-200 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-600"
+        className="flex shrink-0 items-center justify-center rounded bg-plum-200 text-plum-400 dark:bg-plum-800 dark:text-plum-600"
       >
         <svg viewBox="0 0 24 24" width={size * 0.4} height={size * 0.4} fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
           <circle cx="12" cy="12" r="9" />
@@ -64,7 +64,7 @@ export function AlbumCover({
       loading={priority ? "eager" : "lazy"}
       decoding="async"
       onError={() => setFailed(true)}
-      className="shrink-0 rounded bg-zinc-200 object-cover dark:bg-zinc-800"
+      className="shrink-0 rounded bg-plum-200 object-cover dark:bg-plum-800"
     />
   );
 }

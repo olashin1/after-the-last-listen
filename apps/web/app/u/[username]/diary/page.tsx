@@ -40,14 +40,14 @@ async function Rows({ username, isOwner, cursor }: { username: string; isOwner: 
 
   if (items.length === 0 && !cursor) {
     return (
-      <div className="flex flex-col items-center gap-4 rounded-lg border border-dashed border-zinc-300 px-6 py-12 text-center dark:border-zinc-700">
+      <div className="flex flex-col items-center gap-4 rounded-lg border border-dashed border-plum-300 px-6 py-12 text-center dark:border-plum-700">
         <p className="text-lg font-medium">No logs yet</p>
         {isOwner ? (
-          <LogButton className="rounded-md bg-violet-600 px-4 py-2 font-medium text-white hover:bg-violet-700">
+          <LogButton className="rounded-md bg-iris-600 px-4 py-2 font-medium text-white hover:bg-iris-700">
             Log your first album +
           </LogButton>
         ) : (
-          <p className="text-sm text-zinc-500">@{username} hasn&apos;t logged any albums yet.</p>
+          <p className="text-sm text-plum-500">@{username} hasn&apos;t logged any albums yet.</p>
         )}
       </div>
     );
@@ -56,10 +56,10 @@ async function Rows({ username, isOwner, cursor }: { username: string; isOwner: 
   const last = items.at(-1);
   return (
     <>
-      <ol className="flex flex-col divide-y divide-zinc-200 dark:divide-zinc-800">
+      <ol className="flex flex-col divide-y divide-plum-200 dark:divide-plum-800">
         {items.map((item) => (
           <li key={item.listen_id} className="flex items-center gap-4 py-3">
-            <time dateTime={item.listened_on} className="w-24 shrink-0 text-sm text-zinc-500 tabular-nums">
+            <time dateTime={item.listened_on} className="w-24 shrink-0 text-sm text-plum-500 tabular-nums">
               {formatListenDate(item.listened_on)}
             </time>
             <Link href={`/album/${item.album_id}`} className="shrink-0">
@@ -67,10 +67,10 @@ async function Rows({ username, isOwner, cursor }: { username: string; isOwner: 
             </Link>
             <div className="flex min-w-0 flex-1 flex-col gap-0.5">
               <Link href={`/album/${item.album_id}`} className="font-medium break-words hover:underline">{item.title}</Link>
-              <span className="text-sm text-zinc-500 break-words">{item.artist_credit || "Unknown artist"}</span>
+              <span className="text-sm text-plum-500 break-words">{item.artist_credit || "Unknown artist"}</span>
               {item.shooting_star_title && <ShootingStarLabel title={item.shooting_star_title} className="text-sm" />}
             </div>
-            <RatingStars rating={item.rating === null ? null : Number(item.rating)} size={14} />
+            <RatingStars rating={item.rating === null ? null : Number(item.rating)} size={21} />
           </li>
         ))}
       </ol>
@@ -89,7 +89,7 @@ async function Rows({ username, isOwner, cursor }: { username: string; isOwner: 
 export default function DiaryPage(props: PageProps<"/u/[username]/diary">) {
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-12">
-      <Suspense fallback={<p className="text-sm text-zinc-500">Loading diary…</p>}>
+      <Suspense fallback={<p className="text-sm text-plum-500">Loading diary…</p>}>
         <Diary {...props} />
       </Suspense>
     </main>

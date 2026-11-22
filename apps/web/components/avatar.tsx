@@ -20,7 +20,7 @@ export function Avatar({ path, name, size }: { path: string | null | undefined; 
     <span
       aria-hidden
       style={{ ...style, fontSize: Math.max(10, Math.round(size * 0.42)) }}
-      className="flex shrink-0 select-none items-center justify-center rounded-full bg-zinc-200 font-medium uppercase text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
+      className="flex shrink-0 select-none items-center justify-center rounded-full bg-plum-200 font-medium uppercase text-plum-600 dark:bg-plum-800 dark:text-plum-300"
     >
       {name.trim().charAt(0) || "?"}
     </span>

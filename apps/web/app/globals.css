@@ -1,8 +1,19 @@
 @import "tailwindcss";
 
+/*
+ * Colour scheme (docs/decisions.md, design): soft shades of purple, in light and dark mode
+ * (following the system setting).
+ *   plum  muted purple-greys for text, borders and surfaces (in place of Tailwind's zinc)
+ *   iris  the accent: buttons, focus rings, rating stars, the active tab
+ *   star  a soft gold kept for the Shooting Star, so it stands apart from rating stars
+ * Red (errors) and green (success) stay as Tailwind's.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #faf8fd;
+  --foreground: #241b33;
+  /* Native controls (radios, scrollbars, the date picker) follow the theme too. */
+  color-scheme: light;
+  accent-color: #7a5bc7;
 }
 
 @theme inline {
@@ -12,15 +23,49 @@
   --font-mono: var(--font-geist-mono);
 }
 
+@theme {
+  --color-plum-50: #f8f6fb;
+  --color-plum-100: #efeaf6;
+  --color-plum-200: #e0d8ec;
+  --color-plum-300: #c9bcdb;
+  --color-plum-400: #a596bd;
+  --color-plum-500: #7f6f9a;
+  --color-plum-600: #65577d;
+  --color-plum-700: #4d4262;
+  --color-plum-800: #352d45;
+  --color-plum-900: #231d2f;
+  --color-plum-950: #16121e;
+
+  --color-iris-50: #f5f1fd;
+  --color-iris-100: #ebe3fa;
+  --color-iris-200: #d7c8f4;
+  --color-iris-300: #bfa8ec;
+  --color-iris-400: #a98ce6;
+  --color-iris-500: #8f6fd8;
+  --color-iris-600: #7a5bc7;
+  --color-iris-700: #6649ad;
+  --color-iris-800: #523b8a;
+  --color-iris-900: #3d2d66;
+  --color-iris-950: #261c40;
+
+  --color-star-50: #fbf5e6;
+  --color-star-400: #e9c46a;
+  --color-star-500: #d9ae4a;
+  --color-star-600: #c99a2e;
+  --color-star-950: #2e2410;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #16121e;
+    --foreground: #ece6f5;
+    color-scheme: dark;
+    accent-color: #a98ce6;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 }
