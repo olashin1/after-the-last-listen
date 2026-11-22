@@ -20,7 +20,7 @@ const DB_ERRORS: Record<string, string> = {
   invalid_rating: "Ratings go from half a star to five stars.",
   review_too_long: "Reviews can be at most 5,000 characters.",
   invalid_shooting_star: "Pick your Shooting Star from this album's tracklist.",
-  not_in_collection: "This album isn't in your albums yet. Log it first.",
+  not_in_collection: "This album isn't in your albums.",
 };
 
 export const AVATAR_RULES = "JPEG, PNG or WebP. We crop it to a square.";

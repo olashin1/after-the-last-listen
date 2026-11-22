@@ -185,7 +185,21 @@ isOneToOne: false
           }
         },"public": {
           Tables: {
-            "listens": {
+            "listen_list": {
+                  Row: {
+                    "added_at": string,"album_id": number,"id": number,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "added_at"?: string,"album_id": number,"id"?: never,"user_id": string
+                  }
+                  Update: {
+                    "added_at"?: string,"album_id"?: number,"id"?: never,"user_id"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"listens": {
                   Row: {
                     "created_at": string,"id": number,"listened_on": string,"note": string | null,"request_id": string | null,"user_album_id": number,"user_id": string
                   }
@@ -242,6 +256,9 @@ isOneToOne: false
             "add_live_albums":
 { Args: { "p_albums": Json,"p_query": string }; Returns: number
                            },
+"add_to_listen_list":
+{ Args: { "p_album_id": number }; Returns: undefined
+                           },
 "can_view_user_content":
 { Args: { "p_owner": string }; Returns: boolean
                            },
@@ -273,6 +290,11 @@ isOneToOne: false
               "album_id": number,"artist_credit": string,"created_at": string,"first_release_date": string,"listen_id": number,"listened_on": string,"mbid": string,"note": string,"rating": number,"review": string,"shooting_star_title": string,"title": string
             }[]
                            },
+"get_listen_list":
+{ Args: { "p_before_added"?: string,"p_before_id"?: number,"p_lim"?: number,"p_username": string }; Returns: {
+              "added_at": string,"album_id": number,"artist_credit": string,"first_release_date": string,"listen_list_id": number,"mbid": string,"title": string
+            }[]
+                           },
 "get_user_album":
 { Args: { "p_album_id": number }; Returns: {
               "created_at": string,"first_listened_on": string,"id": number,"last_listened_on": string,"listen_count": number,"rating": number,"review": string,"shooting_star_recording_mbid": string,"shooting_star_title": string,"updated_at": string
@@ -291,6 +313,12 @@ isOneToOne: false
                            },
 "remove_avatar":
 { Args: Record<PropertyKey, never>; Returns: string
+                           },
+"remove_from_listen_list":
+{ Args: { "p_album_id": number }; Returns: undefined
+                           },
+"remove_user_album":
+{ Args: { "p_album_id": number }; Returns: number
                            },
 "search_albums":
 { Args: { "lim"?: number,"q": string }; Returns: {

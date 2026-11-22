@@ -35,6 +35,7 @@ const TABS = [
   { key: "profile", label: "Profile", path: "" },
   { key: "albums", label: "Albums", path: "/albums" },
   { key: "diary", label: "Diary", path: "/diary" },
+  { key: "listen-list", label: "Listen List", path: "/listen-list" },
 ] as const;
 
 export function ProfileNav({ username, current }: { username: string; current: (typeof TABS)[number]["key"] }) {

@@ -2,12 +2,15 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { Suspense } from "react";
 import Link from "next/link";
 import { AlbumCover } from "@/components/album-cover";
+import { ListenListButton } from "@/components/listen-list-button";
 import { LogButton } from "@/components/log/log-dialog";
 import { RatingStars, ShootingStarIcon, ShootingStarLabel } from "@/components/rating-stars";
+import { RemoveAlbumButton } from "@/components/remove-album-button";
 import { type Album as AlbumRow, getAlbum, getTracklist } from "@/lib/album";
 import { getCurrentProfile } from "@/lib/auth";
 import { getUserAlbum } from "@/lib/collection";
 import { formatListenDate } from "@/lib/dates";
+import { isOnListenList } from "@/lib/listen-list";
 import { formatDuration } from "@atll/musicbrainz";
 
 // Album page (PRD Phase 2 "find and inspect an album"): cover, title, then the canonical release's
@@ -73,13 +76,14 @@ async function YourLog({ album }: { album: AlbumRow }) {
     );
   }
 
-  const entry = await getUserAlbum(album.id);
+  const [entry, onListenList] = await Promise.all([getUserAlbum(album.id), isOnListenList(album.id)]);
   if (!entry) {
     return (
-      <div className="flex justify-center">
+      <div className="flex flex-wrap items-start justify-center gap-3">
         <LogButton albumId={album.id} className="rounded-md bg-iris-600 px-5 py-2 font-medium text-white hover:bg-iris-700">
           Log +
         </LogButton>
+        <ListenListButton albumId={album.id} onList={onListenList} />
       </div>
     );
   }
@@ -93,6 +97,7 @@ async function YourLog({ album }: { album: AlbumRow }) {
           <LogButton albumId={album.id} mode="edit" className="text-sm text-plum-600 underline dark:text-plum-400">
             Edit
           </LogButton>
+          <RemoveAlbumButton albumId={album.id} title={album.title} listenCount={entry.listen_count} />
           <LogButton albumId={album.id} className="rounded-md bg-iris-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-iris-700">
             Log again +
           </LogButton>

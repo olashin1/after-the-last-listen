@@ -2,6 +2,23 @@
 
 Open and settled decisions that aren't in `docs/prd.md`. Newest first.
 
+## 2026-11-22: Removing albums, and the Listen List (decided with the user)
+
+- **Remove an album** (PRD §5, Phase 4):
+  - `remove_user_album()` deletes your collection record for an album and, by cascade, every listen of it, then returns how many listens went.
+  - On the album page, **Remove** sits next to Edit in "Your log" and opens a confirmation, e.g. "Remove *Discovery* from your albums? This deletes 2 listens from your diary, plus your rating, review and Shooting Star. This can't be undone."
+  - Deleting a single diary entry was left out (the user chose whole albums only for now).
+- **Listen List** (a new feature, not in the PRD): albums you want to listen to.
+  - **Storage:** `public.listen_list` (user, album, `added_at`, unique per user and album).
+  - **Visibility:** the same as albums and the diary (`can_view_user_content`). Public profiles: anyone; private: the owner only.
+  - **Writes** go through `add_to_listen_list()` (idempotent; rejects unknown and merged albums) and `remove_from_listen_list()`. `get_listen_list()` reads it newest first, with a cursor.
+  - **Logging an album takes it off your Listen List** (`log_album()`, same transaction).
+  - **On the album page,** when you haven't logged it: **+ Listen List** / **✓ On your Listen List** next to Log +.
+  - **List page:** `/u/[username]/listen-list`, a profile tab, an account-menu item and a `/listen-list` shortcut. The owner gets **Log +** and **Remove** on each album; removal there needs no confirmation, since it's easy to add back. Every card has the same text area (title up to 2 lines with room always kept for 2, artist on 1 line, full text on hover), so the buttons line up across each row.
+  - **Merge follow-up:** when `apply_album_redirect()` moves user data to a merge survivor (the open Phase 3 merge step), it must move `listen_list` rows too.
+- **The signed-in landing page no longer shows How it works.**
+- **Branch:** `feat/listen-list`, stacked on `feat/landing-page` (PR #11).
+
 ## 2026-11-22: Landing page (decided with the user)
 
 - **Signed out:**
