@@ -2,6 +2,16 @@
 
 Open and settled decisions that aren't in `docs/prd.md`. Newest first.
 
+## 2026-11-21: No Redis for now
+
+- **Asked:** would Redis make the web app faster? **No, not today.** Where time goes:
+  - **Search** (`search_albums`, p50 122 ms, p95 913 ms): a result cache would only help repeated identical queries, and search-as-you-type sends many distinct ones. The slow cases are long multi-word queries, which need query or index work.
+  - **Tracklists:** already cached in Postgres (`catalog.tracks`); pre-warming (Phase 5) removes the cold misses.
+  - **Album, collection and diary reads** are small indexed queries that Postgres keeps in memory. Caching private data in Redis would also move the privacy checks (RLS) out of the database.
+  - **Cover art** is cached by the browser, and auth uses Supabase JWTs. Neither would gain anything.
+- **The one real candidate is the shared MusicBrainz rate limit** across server instances (a before-launch item). That's about staying within MusicBrainz's limit, not speed. Try a Postgres-based limiter first (one row handing out the next allowed send time); use a hosted Redis such as Upstash only if that falls short.
+- **Performance work that would help instead:** bring search p95 toward the PRD's 200 ms, pre-warm tracklists, and store "last listened" on `user_albums` if My Albums gets slow.
+
 ## 2026-11-21: Logging UI and My Albums (decided with the user)
 
 - **A purple "Log +" button** sits at the right of the header when you're signed in. It opens one app-wide pop-up (a native `<dialog>` in the root layout, `components/log/log-dialog.tsx`): first a search (debounced 300 ms, local search plus the live MusicBrainz fallback when results are weak), then the log form. **An album page has its own Log button** that opens the form straight on that album. "Edit" opens the same form without a date and doesn't add a listen.
