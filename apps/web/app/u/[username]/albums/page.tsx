@@ -2,10 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { AlbumCover } from "@/components/album-cover";
+import { AlbumTile } from "@/components/album-tile";
 import { LogButton } from "@/components/log/log-dialog";
-import { loadProfilePage, PrivateNotice, ProfileNav } from "@/components/profile-nav";
-import { RatingStars, ShootingStarLabel } from "@/components/rating-stars";
+import { loadProfilePage, PrivateNotice, ProfileHeading, ProfileNav } from "@/components/profile-nav";
 import { collectionCursor, getCollection } from "@/lib/collection";
 
 export const metadata: Metadata = { title: "Albums" };
@@ -24,7 +23,12 @@ async function Albums({ params, searchParams }: PageProps<"/u/[username]/albums"
 
   return (
     <>
-      <h1 className="text-2xl font-semibold tracking-tight break-words">{isOwner ? "My Albums" : `${name}'s albums`}</h1>
+      <ProfileHeading
+        title={isOwner ? "My Albums" : `${name}'s albums`}
+        username={profile.username}
+        name={name}
+        avatarPath={profile.avatar_url}
+      />
       <ProfileNav username={profile.username} current="albums" />
       {contentHidden ? (
         <PrivateNotice />
@@ -60,22 +64,11 @@ async function Grid({ username, isOwner, cursor }: { username: string; isOwner: 
   return (
     <>
       <ul className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 md:grid-cols-4">
-        {items.map((item) => {
-          const rating = item.rating === null ? null : Number(item.rating);
-          return (
-            <li key={item.user_album_id}>
-              <Link href={`/album/${item.album_id}`} className="group flex flex-col gap-1.5">
-                <span className="block aspect-square w-full overflow-hidden rounded [&>*]:!h-full [&>*]:!w-full">
-                  <AlbumCover mbid={item.mbid} title={item.title} size={200} />
-                </span>
-                <span className="text-sm font-medium leading-snug break-words group-hover:underline">{item.title}</span>
-                <span className="-mt-1 text-xs text-plum-500 break-words">{item.artist_credit || "Unknown artist"}</span>
-                <RatingStars rating={rating} size={21} />
-                {item.shooting_star_title && <ShootingStarLabel title={item.shooting_star_title} className="text-xs" />}
-              </Link>
-            </li>
-          );
-        })}
+        {items.map((item) => (
+          <li key={item.user_album_id}>
+            <AlbumTile item={item} />
+          </li>
+        ))}
       </ul>
       <div className="flex justify-between text-sm">
         {cursor ? <Link href={`/u/${username}/albums`} className="underline">← Most recent</Link> : <span />}
