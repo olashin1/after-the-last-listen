@@ -29,6 +29,7 @@ export type CollectionItem = {
   shooting_star_title: string | null;
   listen_count: number;
   last_listened_on: string;
+  review: string | null;
 };
 
 export type DiaryItem = {
@@ -43,6 +44,8 @@ export type DiaryItem = {
   first_release_date: string | null;
   rating: number | null;
   shooting_star_title: string | null;
+  /** The album's review, on its most recent listen only (NULL on older rows and unreviewed albums). */
+  review: string | null;
 };
 
 export const COLLECTION_PAGE = 48;
@@ -78,6 +81,20 @@ export async function getCollection(username: string, cursor?: string) {
   if (error) throw new Error(`get_collection failed: ${error.message}`);
   const items = data as CollectionItem[];
   return { items: items.slice(0, COLLECTION_PAGE), hasMore: items.length > COLLECTION_PAGE };
+}
+
+export const PROFILE_RECENT = 3;
+
+/** The profile page's sections: the most recently listened albums, and the most recent reviewed ones. */
+export async function getRecent(username: string) {
+  const supabase = await createClient();
+  const [recent, reviewed] = await Promise.all([
+    supabase.rpc("get_collection", { p_username: username, p_lim: PROFILE_RECENT }),
+    supabase.rpc("get_collection", { p_username: username, p_lim: PROFILE_RECENT, p_reviewed_only: true }),
+  ]);
+  if (recent.error) throw new Error(`get_collection failed: ${recent.error.message}`);
+  if (reviewed.error) throw new Error(`get_collection failed: ${reviewed.error.message}`);
+  return { recent: recent.data as CollectionItem[], reviewed: reviewed.data as CollectionItem[] };
 }
 
 /** Cursor for the next diary page: "<listened_on>_<listen_id>_<created_at>". */

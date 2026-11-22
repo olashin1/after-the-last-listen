@@ -2,7 +2,7 @@
 
 Status of each phase in `docs/prd.md` §12. Updated at the end of every task (see CLAUDE.md).
 
-Last updated: 2026-11-21 (Phase 3 logging)
+Last updated: 2026-11-22
 
 ## Phase 1: Foundation + search spike (done)
 
@@ -64,6 +64,8 @@ Done when: one action saves both the collection record and the diary date; the S
 Done when: a repeat album appears several times in the diary but once in the collection.
 
 - [ ] Chronological timeline
+  - [x] Diary rows show the review on each album's most recent listen; profile pictures on users' Albums and Diary pages (2026-11-22)
+  - [x] Diary scaled up about 1.5× (2026-11-22)
 - [ ] Log Again with a note
 - [ ] Filters
 - [ ] Edit and delete listens
@@ -82,6 +84,7 @@ Done when: a repeat album appears several times in the diary but once in the col
 
 Done when: core workflows work on desktop and mobile web for multiple accounts; private profiles are hidden.
 
+- [x] Profile page: recently listened (3) and recent reviews (3) (2026-11-22, branch `feat/profile-pages`)
 - [ ] Top five favorites
 - [ ] Shooting Stars view
 - [ ] Empty states

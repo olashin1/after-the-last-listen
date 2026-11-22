@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { AlbumCover } from "@/components/album-cover";
 import { LogButton } from "@/components/log/log-dialog";
-import { loadProfilePage, PrivateNotice, ProfileNav } from "@/components/profile-nav";
+import { loadProfilePage, PrivateNotice, ProfileHeading, ProfileNav } from "@/components/profile-nav";
 import { RatingStars, ShootingStarLabel } from "@/components/rating-stars";
 import { diaryCursor, getDiary } from "@/lib/collection";
 import { formatListenDate } from "@/lib/dates";
@@ -12,7 +12,7 @@ import { formatListenDate } from "@/lib/dates";
 export const metadata: Metadata = { title: "Diary" };
 
 // Diary (PRD §2, §3; Phase 3 basic version): every listen newest first, same-day repeats included,
-// with the album's rating and Shooting Star. Filters, Log Again notes and editing listens are Phase 4.
+// with the album's rating and Shooting Star, and its review on the album's most recent listen. Filters, Log Again notes and editing listens are Phase 4.
 
 async function Diary({ params, searchParams }: PageProps<"/u/[username]/diary">) {
   const { username } = await params;
@@ -24,7 +24,12 @@ async function Diary({ params, searchParams }: PageProps<"/u/[username]/diary">)
 
   return (
     <>
-      <h1 className="text-2xl font-semibold tracking-tight break-words">{isOwner ? "My Diary" : `${name}'s diary`}</h1>
+      <ProfileHeading
+        title={isOwner ? "My Diary" : `${name}'s diary`}
+        username={profile.username}
+        name={name}
+        avatarPath={profile.avatar_url}
+      />
       <ProfileNav username={profile.username} current="diary" />
       {contentHidden ? (
         <PrivateNotice />
@@ -58,19 +63,20 @@ async function Rows({ username, isOwner, cursor }: { username: string; isOwner: 
     <>
       <ol className="flex flex-col divide-y divide-plum-200 dark:divide-plum-800">
         {items.map((item) => (
-          <li key={item.listen_id} className="flex items-center gap-4 py-3">
-            <time dateTime={item.listened_on} className="w-24 shrink-0 text-sm text-plum-500 tabular-nums">
+          <li key={item.listen_id} className={`flex gap-5 py-4 ${item.review ? "items-start" : "items-center"}`}>
+            <time dateTime={item.listened_on} className="w-28 shrink-0 text-plum-500 tabular-nums">
               {formatListenDate(item.listened_on)}
             </time>
             <Link href={`/album/${item.album_id}`} className="shrink-0">
-              <AlbumCover mbid={item.mbid} title={item.title} size={48} />
+              <AlbumCover mbid={item.mbid} title={item.title} size={72} />
             </Link>
-            <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-              <Link href={`/album/${item.album_id}`} className="font-medium break-words hover:underline">{item.title}</Link>
-              <span className="text-sm text-plum-500 break-words">{item.artist_credit || "Unknown artist"}</span>
-              {item.shooting_star_title && <ShootingStarLabel title={item.shooting_star_title} className="text-sm" />}
+            <div className="flex min-w-0 flex-1 flex-col gap-1">
+              <Link href={`/album/${item.album_id}`} className="text-lg font-medium break-words hover:underline">{item.title}</Link>
+              <span className="-mt-1 text-plum-500 break-words">{item.artist_credit || "Unknown artist"}</span>
+              {item.review && <p className="my-1 whitespace-pre-line break-words">{item.review}</p>}
+              {item.shooting_star_title && <ShootingStarLabel title={item.shooting_star_title} />}
             </div>
-            <RatingStars rating={item.rating === null ? null : Number(item.rating)} size={21} />
+            <RatingStars rating={item.rating === null ? null : Number(item.rating)} size={26} />
           </li>
         ))}
       </ol>
@@ -88,7 +94,7 @@ async function Rows({ username, isOwner, cursor }: { username: string; isOwner: 
 
 export default function DiaryPage(props: PageProps<"/u/[username]/diary">) {
   return (
-    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-12">
+    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-12">
       <Suspense fallback={<p className="text-sm text-plum-500">Loading diary…</p>}>
         <Diary {...props} />
       </Suspense>
