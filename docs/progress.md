@@ -86,6 +86,7 @@ Done when: core workflows work on desktop and mobile web for multiple accounts; 
 - [ ] Shooting Stars view
 - [ ] Empty states
 - [ ] Visual design pass: give every page and empty space (starting with the landing page) a polished look with pictures, music-themed visuals and intentional spacing
+  - [x] Soft purple colour scheme (light and dark) and bigger, rounded stars (2026-11-21, branch `feat/design-purple`)
 - [ ] Responsive design
 - [ ] Privacy toggle
 - [ ] Popularity from ListenBrainz
