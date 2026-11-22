@@ -59,6 +59,7 @@ export function AccountMenu({ username, avatar }: { username: string; avatar: Re
         >
           <Link role="menuitem" href={`/u/${username}`} onClick={close} className={itemClass}>Profile</Link>
           <Link role="menuitem" href={`/u/${username}/diary`} onClick={close} className={itemClass}>Diary</Link>
+          <Link role="menuitem" href={`/u/${username}/listen-list`} onClick={close} className={itemClass}>Listen List</Link>
           <Link role="menuitem" href="/settings/profile" onClick={close} className={itemClass}>Settings</Link>
           <div className="my-1 border-t border-plum-200 dark:border-plum-800" />
           <form action={signOut}>
