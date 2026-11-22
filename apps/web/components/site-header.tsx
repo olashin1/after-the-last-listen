@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { signOut } from "@/app/(auth)/actions";
 import { Avatar } from "@/components/avatar";
+import { LogButton } from "@/components/log/log-dialog";
 import { getCurrentProfile } from "@/lib/auth";
 
 async function AccountLinks() {
@@ -18,6 +19,7 @@ async function AccountLinks() {
 
   return (
     <>
+      <Link href={`/u/${profile.username}/albums`}>My Albums</Link>
       <Link href={`/u/${profile.username}`} className="flex items-center gap-2">
         <Avatar path={profile.avatar_url} name={profile.display_name ?? profile.username} size={24} />
         @{profile.username}
@@ -26,6 +28,8 @@ async function AccountLinks() {
       <form action={signOut}>
         <button type="submit" className="cursor-pointer">Sign out</button>
       </form>
+      {/* Rightmost: logging is the main action (docs/decisions.md, logging UI). */}
+      <LogButton>Log +</LogButton>
     </>
   );
 }

@@ -12,6 +12,15 @@ const DB_ERRORS: Record<string, string> = {
   not_authenticated: "Your session has expired. Sign in again.",
   profile_not_found: "We couldn't find your profile.",
   invalid_avatar: "That upload didn't go through. Try choosing the image again.",
+  // Logging (log_album, update_user_album).
+  album_not_found: "We couldn't find that album.",
+  album_merged: "This album was merged into another one. Open it again to log the current version.",
+  invalid_date: "Choose a valid date.",
+  future_date: "The listen date can't be in the future.",
+  invalid_rating: "Ratings go from half a star to five stars.",
+  review_too_long: "Reviews can be at most 5,000 characters.",
+  invalid_shooting_star: "Pick your Shooting Star from this album's tracklist.",
+  not_in_collection: "This album isn't in your albums yet. Log it first.",
 };
 
 export const AVATAR_RULES = "JPEG, PNG or WebP. We crop it to a square.";
