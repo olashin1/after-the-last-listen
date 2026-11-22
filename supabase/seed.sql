@@ -3,6 +3,9 @@
 -- Two confirmed test accounts, so testing doesn't need a sign-up and Mailpit after every reset:
 --   alice@demo.test / password123   (username demo_alice, public profile)
 --   bob@demo.test   / password123   (username demo_bob, private profile; for cross-user checks)
+--   test@gmail.com  / 1234          (username tester, public profile; the user's own manual-testing account.
+--                                    The password is under the 8-character minimum, which Auth only checks
+--                                    at sign-up and password change, so seeding it still allows sign-in.)
 -- Names differ from the SQL tests' fixtures (alice@example.com…), which must not collide.
 -- The sign-up trigger (handle_new_user) creates their profiles from raw_user_meta_data.
 
@@ -12,9 +15,10 @@ declare
 begin
   for u in
     select * from (values
-      ('00000000-0000-4000-8000-00000000a11c'::uuid, 'alice@demo.test', 'demo_alice'),
-      ('00000000-0000-4000-8000-000000000b0b'::uuid, 'bob@demo.test', 'demo_bob')
-    ) as t(id, email, username)
+      ('00000000-0000-4000-8000-00000000a11c'::uuid, 'alice@demo.test', 'demo_alice', 'password123'),
+      ('00000000-0000-4000-8000-000000000b0b'::uuid, 'bob@demo.test', 'demo_bob', 'password123'),
+      ('00000000-0000-4000-8000-0000000007e5'::uuid, 'test@gmail.com', 'tester', '1234')
+    ) as t(id, email, username, password)
   loop
     insert into auth.users (
       instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
@@ -23,7 +27,7 @@ begin
       confirmation_token, recovery_token, email_change, email_change_token_new
     ) values (
       '00000000-0000-0000-0000-000000000000', u.id, 'authenticated', 'authenticated', u.email,
-      extensions.crypt('password123', extensions.gen_salt('bf')), now(),
+      extensions.crypt(u.password, extensions.gen_salt('bf')), now(),
       '{"provider": "email", "providers": ["email"]}', jsonb_build_object('username', u.username), now(), now(),
       '', '', '', ''
     );
