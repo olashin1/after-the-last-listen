@@ -69,7 +69,7 @@ Done when: a repeat album appears several times in the diary but once in the col
 - [ ] Log Again with a note
 - [ ] Filters
 - [ ] Edit and delete listens
-- [ ] Remove an album
+- [x] Remove an album (with a confirmation that counts the listens; 2026-11-22, branch `feat/listen-list`)
 
 ## Before launch (carried from earlier phases)
 
@@ -85,6 +85,7 @@ Done when: a repeat album appears several times in the diary but once in the col
 Done when: core workflows work on desktop and mobile web for multiple accounts; private profiles are hidden.
 
 - [x] Profile page: recently listened (3) and recent reviews (3) (2026-11-22, branch `feat/profile-pages`)
+- [x] Listen List (not in the PRD): add from album pages, profile tab, logging removes it (2026-11-22)
 - [ ] Top five favorites
 - [ ] Shooting Stars view
 - [ ] Empty states (first-log prompt on the signed-in home done 2026-11-22)
