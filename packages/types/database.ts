@@ -185,7 +185,27 @@ isOneToOne: false
           }
         },"public": {
           Tables: {
-            "profiles": {
+            "listens": {
+                  Row: {
+                    "created_at": string,"id": number,"listened_on": string,"note": string | null,"request_id": string | null,"user_album_id": number,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"id"?: never,"listened_on": string,"note"?: string | null,"request_id"?: string | null,"user_album_id": number,"user_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"id"?: never,"listened_on"?: string,"note"?: string | null,"request_id"?: string | null,"user_album_id"?: number,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "listens_user_album_fkey"
+      columns: ["user_album_id","user_id"]
+isOneToOne: false
+      referencedRelation: "user_albums"
+      referencedColumns: ["id","user_id"]
+    }
+                  ]
+                },"profiles": {
                   Row: {
                     "avatar_url": string | null,"bio": string | null,"created_at": string,"display_name": string | null,"user_id": string,"username": string,"visibility": Database["public"]['Enums']["profile_visibility"]
                   }
@@ -195,6 +215,20 @@ isOneToOne: false
                   }
                   Update: {
                     "avatar_url"?: string | null,"bio"?: string | null,"created_at"?: string,"display_name"?: string | null,"user_id"?: string,"username"?: string,"visibility"?: Database["public"]['Enums']["profile_visibility"]
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"user_albums": {
+                  Row: {
+                    "album_id": number,"created_at": string,"id": number,"rating": number | null,"review": string | null,"shooting_star_recording_mbid": string | null,"shooting_star_title": string | null,"updated_at": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "album_id": number,"created_at"?: string,"id"?: never,"rating"?: number | null,"review"?: string | null,"shooting_star_recording_mbid"?: string | null,"shooting_star_title"?: string | null,"updated_at"?: string,"user_id": string
+                  }
+                  Update: {
+                    "album_id"?: number,"created_at"?: string,"id"?: never,"rating"?: number | null,"review"?: string | null,"shooting_star_recording_mbid"?: string | null,"shooting_star_title"?: string | null,"updated_at"?: string,"user_id"?: string
                   }
                   Relationships: [
                     
@@ -224,11 +258,31 @@ isOneToOne: false
               "disc_number": number,"length_ms": number,"position": number,"recording_mbid": string,"title": string
             }[]
                            },
+"get_collection":
+{ Args: { "p_before_id"?: number,"p_before_listened"?: string,"p_lim"?: number,"p_username": string }; Returns: {
+              "album_id": number,"artist_credit": string,"first_release_date": string,"last_listened_on": string,"listen_count": number,"mbid": string,"rating": number,"shooting_star_title": string,"title": string,"user_album_id": number
+            }[]
+                           },
+"get_diary":
+{ Args: { "p_before_created"?: string,"p_before_id"?: number,"p_before_listened"?: string,"p_lim"?: number,"p_username": string }; Returns: {
+              "album_id": number,"artist_credit": string,"created_at": string,"first_release_date": string,"listen_id": number,"listened_on": string,"mbid": string,"note": string,"rating": number,"shooting_star_title": string,"title": string
+            }[]
+                           },
+"get_user_album":
+{ Args: { "p_album_id": number }; Returns: {
+              "created_at": string,"first_listened_on": string,"id": number,"last_listened_on": string,"listen_count": number,"rating": number,"review": string,"shooting_star_recording_mbid": string,"shooting_star_title": string,"updated_at": string
+            }[]
+                           },
 "is_valid_username":
 { Args: { "p_username": string }; Returns: boolean
                            },
 "live_search_due":
 { Args: { "q": string }; Returns: boolean
+                           },
+"log_album":
+{ Args: { "p_album_id": number,"p_listened_on": string,"p_rating"?: number,"p_request_id"?: string,"p_review"?: string,"p_shooting_star_recording_mbid"?: string,"p_today": string }; Returns: {
+              "listen_id": number,"user_album_id": number
+            }[]
                            },
 "remove_avatar":
 { Args: Record<PropertyKey, never>; Returns: string
@@ -257,6 +311,24 @@ isOneToOne: false
                           SetofOptions: {
         from: "*"
         to: "profiles"
+        isOneToOne: true
+        isSetofReturn: false
+      } },
+"update_user_album":
+{ Args: { "p_album_id": number,"p_rating": number,"p_review": string,"p_shooting_star_recording_mbid": string }; Returns: {
+              "album_id": number,
+"created_at": string,
+"id": number,
+"rating": number | null,
+"review": string | null,
+"shooting_star_recording_mbid": string | null,
+"shooting_star_title": string | null,
+"updated_at": string,
+"user_id": string
+            }
+                          SetofOptions: {
+        from: "*"
+        to: "user_albums"
         isOneToOne: true
         isSetofReturn: false
       } }
