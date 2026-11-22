@@ -2,6 +2,22 @@
 
 Open and settled decisions that aren't in `docs/prd.md`. Newest first.
 
+## 2026-11-22: Landing page (decided with the user)
+
+- **Signed out:**
+  - A hero with the tagline "Every album, remembered.", a short pitch, and **Sign up** / **Search albums** buttons.
+  - Beside it, a **cover wall** of 12 well-known albums, each linking to its album page.
+  - Below, **How it works**: four cards for logging a listen, rating and reviewing, the Shooting Star, and the diary.
+- **Signed in:** a personal home. "Welcome back, {name}" with links to My Albums and the diary, a Log + button, and your 3 most recently listened albums. No How it works for signed-in users.
+  - With no logs, a **first-log prompt** (PRD §2) replaces the albums: a search box and a Log button. The welcome's own Log button is hidden then, so only one shows.
+- **Look:** the hero sits on the same background as the rest of the app (no band or gradient). The How it works cards are borderless, on a plain plum fill.
+- **The cover wall is a curated list** (`apps/web/lib/featured.ts`, 12 release-group MBIDs across rock, hip-hop, pop, electronic, jazz and soul). The catalog's only popularity signal, URL link count, ranks obscure albums first: the top 15 albums are all little-known metal records. Each MBID was checked against the local catalog and the Cover Art Archive on 2026-11-22. Replace the list with real popularity (ListenBrainz, Phase 5).
+- **Looking albums up by MBID:** `get_albums_by_mbid()` (migration `20261122120000_featured_albums.sql`) does this.
+  - Albums come back in the order given. Merged albums resolve to their survivor, and unknown or retired ones are skipped, so the list can be edited freely.
+  - It reads at most 24 MBIDs and is callable by `anon`.
+  - It's `security definer` like `search_albums`, because it only returns public catalog columns.
+- **PR #9 had merged into `feat/design-purple` instead of `main`** (its base didn't switch after #8 merged). PR #10 brings its commits to `main`. This branch, `feat/landing-page`, starts from `feat/design-purple`, which has the same content `main` will have after #10.
+
 ## 2026-11-22: Profile pictures on user pages, reviews in the diary (decided with the user)
 
 - **A user's Albums and Diary pages show their profile picture** next to the heading (`ProfileHeading` in `components/profile-nav.tsx`). It links to the profile and uses the letter placeholder when there's no upload. The profile page already had one.

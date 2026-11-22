@@ -87,9 +87,10 @@ Done when: core workflows work on desktop and mobile web for multiple accounts; 
 - [x] Profile page: recently listened (3) and recent reviews (3) (2026-11-22, branch `feat/profile-pages`)
 - [ ] Top five favorites
 - [ ] Shooting Stars view
-- [ ] Empty states
+- [ ] Empty states (first-log prompt on the signed-in home done 2026-11-22)
 - [ ] Visual design pass: give every page and empty space (starting with the landing page) a polished look with pictures, music-themed visuals and intentional spacing
   - [x] Soft purple colour scheme (light and dark) and bigger, rounded stars (2026-11-21, branch `feat/design-purple`)
+  - [x] Landing page: hero with a curated cover wall and How it works (signed out); welcome home with recent albums or a first-log prompt (signed in) (2026-11-22, branch `feat/landing-page`)
 - [ ] Responsive design
 - [ ] Privacy toggle
 - [ ] Popularity from ListenBrainz
