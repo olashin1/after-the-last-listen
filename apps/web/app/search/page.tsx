@@ -18,17 +18,17 @@ function readQuery(params: Awaited<PageProps<"/search">["searchParams"]>): strin
 
 function ResultList({ albums, debug }: { albums: SearchResult[]; debug: boolean }) {
   return (
-    <ol className="flex flex-col divide-y divide-zinc-200 dark:divide-zinc-800">
+    <ol className="flex flex-col divide-y divide-plum-200 dark:divide-plum-800">
       {albums.map((album) => (
         <li key={album.id}>
           <Link
             href={`/album/${album.id}`}
-            className="flex items-center gap-3 rounded py-2 hover:bg-zinc-50 dark:hover:bg-zinc-900"
+            className="flex items-center gap-3 rounded py-2 hover:bg-plum-50 dark:hover:bg-plum-900"
           >
             <AlbumCover mbid={album.mbid} title={album.title} size={48} />
             <span className="flex min-w-0 flex-1 flex-col">
               <span className="font-medium break-words">{album.title}</span>
-              <span className="text-sm text-zinc-500 break-words">
+              <span className="text-sm text-plum-500 break-words">
                 {album.artist_credit || "Unknown artist"}
                 {album.first_release_date && ` · ${album.first_release_date.slice(0, 4)}`}
                 {(album.primary_type !== "Album" || album.secondary_types.length > 0) &&
@@ -36,7 +36,7 @@ function ResultList({ albums, debug }: { albums: SearchResult[]; debug: boolean 
               </span>
             </span>
             {debug && (
-              <span className="shrink-0 font-mono text-xs text-zinc-400 tabular-nums" title="Ranking score / text match">
+              <span className="shrink-0 font-mono text-xs text-plum-400 tabular-nums" title="Ranking score / text match">
                 {album.score.toFixed(3)} / {album.match.toFixed(2)}
               </span>
             )}
@@ -52,7 +52,7 @@ async function LiveResults({ q, shown }: { q: string; shown: number[] }) {
   if (albums.length === 0) return null;
   return (
     <section aria-labelledby="live-heading" className="flex flex-col gap-2">
-      <h2 id="live-heading" className="text-sm font-medium text-zinc-500">New on MusicBrainz</h2>
+      <h2 id="live-heading" className="text-sm font-medium text-plum-500">New on MusicBrainz</h2>
       <ResultList albums={albums} debug={debugToolsEnabled()} />
     </section>
   );
@@ -60,7 +60,7 @@ async function LiveResults({ q, shown }: { q: string; shown: number[] }) {
 
 async function Results({ searchParams }: { searchParams: PageProps<"/search">["searchParams"] }) {
   const q = readQuery(await searchParams);
-  if (!q.trim()) return <p className="text-sm text-zinc-500">Search for an album, an artist, or both.</p>;
+  if (!q.trim()) return <p className="text-sm text-plum-500">Search for an album, an artist, or both.</p>;
 
   let search: Awaited<ReturnType<typeof searchAlbums>>;
   try {
@@ -79,14 +79,14 @@ async function Results({ searchParams }: { searchParams: PageProps<"/search">["s
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-3">
-        <p className="text-sm text-zinc-500" aria-live="polite">
+        <p className="text-sm text-plum-500" aria-live="polite">
           {results.length === 0 ? "No albums found in our catalog." : `${results.length} result${results.length === 1 ? "" : "s"}`}
           {debug && ` in ${ms} ms`}
         </p>
         {results.length > 0 && <ResultList albums={results} debug={debug} />}
       </div>
       {isWeak(results) && (
-        <Suspense fallback={<p className="text-sm text-zinc-500">Checking MusicBrainz for new releases…</p>}>
+        <Suspense fallback={<p className="text-sm text-plum-500">Checking MusicBrainz for new releases…</p>}>
           <LiveResults q={q} shown={results.map((r) => r.id)} />
         </Suspense>
       )}
@@ -107,7 +107,7 @@ async function SearchBox({ searchParams }: { searchParams: PageProps<"/search">[
         aria-label="Search albums"
         className={`${inputClass} min-w-0 flex-1`}
       />
-      <button type="submit" className="rounded-md bg-zinc-900 px-4 py-2 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900">
+      <button type="submit" className="rounded-md bg-plum-900 px-4 py-2 font-medium text-white dark:bg-plum-100 dark:text-plum-900">
         Search
       </button>
     </form>
@@ -121,7 +121,7 @@ export default function SearchPage(props: PageProps<"/search">) {
       <Suspense fallback={null}>
         <SearchBox searchParams={props.searchParams} />
       </Suspense>
-      <Suspense fallback={<p className="text-sm text-zinc-500">Searching…</p>}>
+      <Suspense fallback={<p className="text-sm text-plum-500">Searching…</p>}>
         <Results searchParams={props.searchParams} />
       </Suspense>
     </main>

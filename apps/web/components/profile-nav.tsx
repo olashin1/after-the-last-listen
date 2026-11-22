@@ -26,14 +26,14 @@ const TABS = [
 
 export function ProfileNav({ username, current }: { username: string; current: (typeof TABS)[number]["key"] }) {
   return (
-    <nav aria-label="Profile" className="flex gap-4 border-b border-zinc-200 text-sm dark:border-zinc-800">
+    <nav aria-label="Profile" className="flex gap-4 border-b border-plum-200 text-sm dark:border-plum-800">
       {TABS.map((tab) => (
         <Link
           key={tab.key}
           href={`/u/${username}${tab.path}`}
           aria-current={tab.key === current ? "page" : undefined}
           className={`-mb-px border-b-2 pb-2 ${
-            tab.key === current ? "border-violet-600 font-medium" : "border-transparent text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
+            tab.key === current ? "border-iris-600 font-medium" : "border-transparent text-plum-500 hover:text-plum-900 dark:hover:text-plum-100"
           }`}
         >
           {tab.label}
@@ -45,7 +45,7 @@ export function ProfileNav({ username, current }: { username: string; current: (
 
 export function PrivateNotice() {
   return (
-    <p className="rounded-md border border-zinc-200 p-4 text-sm text-zinc-500 dark:border-zinc-800">
+    <p className="rounded-md border border-plum-200 p-4 text-sm text-plum-500 dark:border-plum-800">
       This profile is private.
     </p>
   );

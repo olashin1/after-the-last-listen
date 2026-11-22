@@ -20,20 +20,20 @@ export function Field({
     <label className="flex flex-col gap-1 text-sm">
       <span className="font-medium">{label}</span>
       {children}
-      {hint && <span className="text-xs text-zinc-500">{hint}</span>}
+      {hint && <span className="text-xs text-plum-500">{hint}</span>}
     </label>
   );
 }
 
 export const inputClass =
-  "rounded-md border border-zinc-300 bg-transparent px-3 py-2 text-base outline-none focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 dark:border-zinc-700 dark:focus:border-zinc-100";
+  "rounded-md border border-plum-300 bg-transparent px-3 py-2 text-base outline-none focus:border-plum-900 focus:ring-2 focus:ring-plum-900/10 dark:border-plum-700 dark:focus:border-plum-100";
 
 export function SubmitButton({ pending, children }: { pending: boolean; children: React.ReactNode }) {
   return (
     <button
       type="submit"
       disabled={pending}
-      className="rounded-md bg-zinc-900 px-4 py-2 font-medium text-white disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900"
+      className="rounded-md bg-plum-900 px-4 py-2 font-medium text-white disabled:opacity-60 dark:bg-plum-100 dark:text-plum-900"
     >
       {pending ? "Working…" : children}
     </button>

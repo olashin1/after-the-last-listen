@@ -10,7 +10,7 @@ import { createClient } from "@/lib/supabase/client";
 import { removeAvatar, setAvatar } from "./actions";
 
 const buttonClass =
-  "cursor-pointer rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-medium disabled:cursor-default disabled:opacity-60 dark:border-zinc-700";
+  "cursor-pointer rounded-md border border-plum-300 px-3 py-1.5 text-sm font-medium disabled:cursor-default disabled:opacity-60 dark:border-plum-700";
 
 /**
  * Upload goes straight from the browser to Storage (skips the 1 MB Server Action body limit),
@@ -92,7 +92,7 @@ export function AvatarForm({ userId, path, name }: { userId: string; path: strin
               </button>
             )}
           </div>
-          <span className="text-xs text-zinc-500">Optional. {AVATAR_RULES}</span>
+          <span className="text-xs text-plum-500">Optional. {AVATAR_RULES}</span>
         </div>
         <input
           ref={inputRef}

@@ -55,12 +55,12 @@ export function LogDialogProvider({ children }: { children: React.ReactNode }) {
         onClose={() => setView(null)}
         // Clicking the backdrop (the dialog element itself, outside its content) closes it.
         onClick={(e) => e.target === e.currentTarget && close()}
-        className="m-auto w-[calc(100%-2rem)] max-w-lg rounded-xl bg-white p-0 text-zinc-900 shadow-xl backdrop:bg-black/50 dark:bg-zinc-900 dark:text-zinc-100"
+        className="m-auto w-[calc(100%-2rem)] max-w-lg rounded-xl bg-white p-0 text-plum-900 shadow-xl backdrop:bg-plum-950/60 dark:bg-plum-900 dark:text-plum-100"
       >
         <div className="flex max-h-[85vh] flex-col">
-          <div className="flex items-center justify-between gap-4 border-b border-zinc-200 px-5 py-3 dark:border-zinc-800">
+          <div className="flex items-center justify-between gap-4 border-b border-plum-200 px-5 py-3 dark:border-plum-800">
             <h2 id="log-dialog-title" className="font-semibold">{title}</h2>
-            <button type="button" onClick={close} aria-label="Close" className="rounded p-1 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100">
+            <button type="button" onClick={close} aria-label="Close" className="rounded p-1 text-plum-500 hover:text-plum-900 dark:hover:text-plum-100">
               ✕
             </button>
           </div>
@@ -88,7 +88,7 @@ export function LogDialogProvider({ children }: { children: React.ReactNode }) {
                   <Link href="/albums" onClick={close} className="underline">My Albums</Link>
                   <Link href="/diary" onClick={close} className="underline">Diary</Link>
                 </div>
-                <button type="button" onClick={close} className="rounded-md bg-violet-600 px-4 py-2 font-medium text-white hover:bg-violet-700">
+                <button type="button" onClick={close} className="rounded-md bg-iris-600 px-4 py-2 font-medium text-white hover:bg-iris-700">
                   Done
                 </button>
               </div>
@@ -104,7 +104,7 @@ export function LogDialogProvider({ children }: { children: React.ReactNode }) {
 export function LogButton({
   albumId,
   mode,
-  className = "rounded-md bg-violet-600 px-3 py-1.5 font-medium text-white hover:bg-violet-700",
+  className = "rounded-md bg-iris-600 px-3 py-1.5 font-medium text-white hover:bg-iris-700",
   children,
 }: OpenOptions & { className?: string; children: React.ReactNode }) {
   const { open } = useLogDialog();

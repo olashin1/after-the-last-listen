@@ -25,7 +25,7 @@ async function Profile({ params }: { params: PageProps<"/u/[username]">["params"
         <Avatar path={profile.avatar_url} name={profile.display_name ?? profile.username} size={80} />
         <div className="flex min-w-0 flex-col gap-1">
           <h1 className="text-3xl font-semibold tracking-tight break-words">{profile.display_name ?? profile.username}</h1>
-          <p className="text-zinc-500">@{profile.username}</p>
+          <p className="text-plum-500">@{profile.username}</p>
         </div>
       </header>
       <ProfileNav username={profile.username} current="profile" />
@@ -33,11 +33,11 @@ async function Profile({ params }: { params: PageProps<"/u/[username]">["params"
       {isOwner && (
         <p className="text-sm">
           <Link href="/settings/profile" className="underline">Edit profile</Link>
-          {profile.visibility === "private" && <span className="text-zinc-500"> · Your profile is private.</span>}
+          {profile.visibility === "private" && <span className="text-plum-500"> · Your profile is private.</span>}
         </p>
       )}
       {contentHidden && (
-        <p className="rounded-md border border-zinc-200 p-4 text-sm text-zinc-500 dark:border-zinc-800">
+        <p className="rounded-md border border-plum-200 p-4 text-sm text-plum-500 dark:border-plum-800">
           This profile is private.
         </p>
       )}
@@ -48,7 +48,7 @@ async function Profile({ params }: { params: PageProps<"/u/[username]">["params"
 export default function ProfilePage(props: PageProps<"/u/[username]">) {
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-4 px-4 py-12">
-      <Suspense fallback={<p className="text-sm text-zinc-500">Loading…</p>}>
+      <Suspense fallback={<p className="text-sm text-plum-500">Loading…</p>}>
         <Profile params={props.params} />
       </Suspense>
     </main>

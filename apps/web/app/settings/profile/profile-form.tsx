@@ -38,13 +38,13 @@ export function ProfileForm({ initial }: { initial: Initial }) {
         <label className="flex items-start gap-2">
           <input type="radio" name="visibility" value="public" defaultChecked={v.visibility === "public"} className="mt-1" />
           <span>
-            Public <span className="text-zinc-500">— anyone can see your albums, diary, ratings and reviews.</span>
+            Public <span className="text-plum-500">— anyone can see your albums, diary, ratings and reviews.</span>
           </span>
         </label>
         <label className="flex items-start gap-2">
           <input type="radio" name="visibility" value="private" defaultChecked={v.visibility === "private"} className="mt-1" />
           <span>
-            Private <span className="text-zinc-500">— only you can see them. Your name, username and bio stay visible.</span>
+            Private <span className="text-plum-500">— only you can see them. Your name, username and bio stay visible.</span>
           </span>
         </label>
       </fieldset>
