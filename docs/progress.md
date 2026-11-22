@@ -63,9 +63,9 @@ Done when: one action saves both the collection record and the diary date; the S
 
 Done when: a repeat album appears several times in the diary but once in the collection.
 
-- [ ] Chronological timeline
-  - [x] Diary rows show the review on each album's most recent listen; profile pictures on users' Albums and Diary pages (2026-11-22)
-  - [x] Diary scaled up about 1.5× (2026-11-22)
+- [x] Chronological timeline: `/u/[username]/diary`, every listen newest first (same-day repeats included), paged by cursor; a re-logged album shows several times in the diary and once in My Albums (built in Phase 3)
+- [x] Diary rows show the review on each album's most recent listen; profile pictures on users' Albums and Diary pages (2026-11-22)
+- [x] Diary scaled up about 1.5× (2026-11-22)
 - [ ] Log Again with a note
 - [ ] Filters
 - [ ] Edit and delete listens
@@ -90,10 +90,10 @@ Done when: core workflows work on desktop and mobile web for multiple accounts; 
 - [ ] Shooting Stars view
 - [ ] Empty states (first-log prompt on the signed-in home done 2026-11-22)
 - [ ] Visual design pass: give every page and empty space (starting with the landing page) a polished look with pictures, music-themed visuals and intentional spacing
-  - [x] Soft purple colour scheme (light and dark) and bigger, rounded stars (2026-11-21, branch `feat/design-purple`)
-  - [x] Landing page: hero with a curated cover wall and How it works (signed out); welcome home with recent albums or a first-log prompt (signed in) (2026-11-22, branch `feat/landing-page`)
+- [x] Soft purple colour scheme (light and dark) and bigger, rounded stars (2026-11-21, branch `feat/design-purple`)
+- [x] Landing page: hero with a curated cover wall and How it works (signed out); welcome home with recent albums or a first-log prompt (signed in) (2026-11-22, branch `feat/landing-page`)
 - [ ] Responsive design
-- [ ] Privacy toggle
+- [x] Privacy toggle: Public/Private choice on `/settings/profile`; private profiles hide albums, diary, ratings and reviews through `can_view_user_content()` (built in Phase 1)
 - [ ] Popularity from ListenBrainz
 - [ ] Reputable-albums filter for search: only show well-known albums, Spotify-style (deferred 2026-11-21). Likely ListenBrainz listener counts, maybe with link count; hide the rest from search with a `listed` flag rather than deleting. Check ListenBrainz batch size and data license first
 - [ ] Tracklist pre-warming
