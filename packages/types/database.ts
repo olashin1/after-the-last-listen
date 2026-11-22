@@ -258,6 +258,11 @@ isOneToOne: false
               "disc_number": number,"length_ms": number,"position": number,"recording_mbid": string,"title": string
             }[]
                            },
+"get_albums_by_mbid":
+{ Args: { "p_mbids": (string)[] }; Returns: {
+              "artist_credit": string,"first_release_date": string,"id": number,"mbid": string,"title": string
+            }[]
+                           },
 "get_collection":
 { Args: { "p_before_id"?: number,"p_before_listened"?: string,"p_lim"?: number,"p_reviewed_only"?: boolean,"p_username": string }; Returns: {
               "album_id": number,"artist_credit": string,"first_release_date": string,"last_listened_on": string,"listen_count": number,"mbid": string,"rating": number,"review": string,"shooting_star_title": string,"title": string,"user_album_id": number
