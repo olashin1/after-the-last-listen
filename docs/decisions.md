@@ -2,6 +2,31 @@
 
 Open and settled decisions that aren't in `docs/prd.md`. Newest first.
 
+## 2026-11-21: Logging UI and My Albums (decided with the user)
+
+- **A purple "Log +" button** sits at the right of the header when you're signed in. It opens one app-wide pop-up (a native `<dialog>` in the root layout, `components/log/log-dialog.tsx`): first a search (debounced 300 ms, local search plus the live MusicBrainz fallback when results are weak), then the log form. **An album page has its own Log button** that opens the form straight on that album. "Edit" opens the same form without a date and doesn't add a listen.
+- **Logging an album already in your albums** opens the form prefilled with your rating, review and Shooting Star. Saving replaces them with what's in the form and adds a new dated listen, so the album is still one tile in My Albums and several rows in the diary. `log_album()` only touches the row when a value actually changed, so `updated_at` means "last edited" (the merge rule relies on it).
+- **My Albums is `/u/[username]/albums`**: a cover grid, most recently listened first, with rating and Shooting Star, and "No logs yet" when empty (with a Log button for the owner). Other people can see a public user's albums; a private user's albums show "This profile is private" (enforced by RLS in `get_collection`). `/albums` and `/diary` redirect to your own pages. The basic diary is `/u/[username]/diary`.
+- **Writes are `security definer`** (`log_album`, `update_user_album`): the tables stay SELECT-only for clients, and the functions take the user from `auth.uid()` only. Reads (`get_user_album`, `get_collection`, `get_diary`) are `security invoker`, so RLS still applies.
+- **Shooting Star check:** the recording must be on the stored tracklist, **or be the entry's current pick**, so a prefilled re-log or edit works when the tracklist isn't loaded or has changed upstream. A different star needs the tracklist. With no tracklist, the form says the star can be added later.
+- **Dates:** `listened_on` from 1900 onwards, and not after the client's local "today". "Today" must be within a day of the server's UTC date.
+- **Retired albums** that weren't merged can still be logged from their page. A merged album's page redirects to the survivor, and `getLogContext` follows the merge too.
+- **My Albums ordering is computed per request** (latest listen per album, with a lateral join). That's fine at MVP sizes; add a stored "last listened" column if large collections get slow.
+- **Known, not from this change:** in dev, every page logs "`Date.now()` while prerendering" from Supabase's auth client (`getClaims` in the header) under Cache Components, and the Grammarly extension causes a hydration warning on `<body>`.
+
+## 2026-11-21: Phase 3 plan (decided with the user)
+
+- **Steps:** `user_albums` and `listens` tables with RLS; `log_album()`; `update_user_album()` (rating, review, Shooting Star; how a star is "added later"); read functions `get_user_album()` and `get_diary()`; merges in `apply_album_redirect()`; logging on the album page; a basic diary.
+- **`listens.user_id` (departs from PRD §6):** listens also store the owner, tied to the parent by a composite FK `(user_album_id, user_id) → user_albums(id, user_id)`. RLS and the diary index `(user_id, listened_on desc, created_at desc)` then need no join, and the FK keeps the two consistent.
+- **Double taps:** each log submit sends a client-generated request UUID, stored unique on `listens`; a repeat submit returns the existing listen instead of adding one (PRD §10, idempotent logging).
+- **Future dates:** `log_album()` takes the client's local date (PRD §9) and rejects it unless it's within one day of the server's UTC date, so a client can't claim a far-future "today".
+- **Merged albums** can't be logged (`album_merged`); their page already redirects. Retired albums that weren't merged can still be logged.
+- **Length limits (not in the PRD):** reviews 5,000 characters, listen notes 500. Blank text is stored as NULL.
+- **Clients only read `user_albums` and `listens`;** every write goes through RPC, and the service role is also read-only until the merge step grants what it needs. `updated_at` is set by a trigger on every update.
+- **Read functions, not table reads,** because the `catalog` schema isn't in the Data API, so PostgREST can't join `user_albums` to albums. They're `security invoker`, so RLS still applies.
+- **Merge rule:** when a merged album's `user_albums` move to the survivor and the user logged both, all listens move to the survivor's entry, and rating, review and Shooting Star come from whichever entry was updated most recently. A star not on the survivor's tracklist is kept (its title is stored). Favorites follow in Phase 5 with `profile_favorites`.
+- **Diary in Phase 3:** a basic `/u/[username]/diary` (newest first, cover, date, rating, Shooting Star, "load more" by cursor), hidden on private profiles by RLS. Filters, Log Again, and edit/delete of listens stay in Phase 4.
+
 ## 2026-11-21: Tracklist storage (decided with the user)
 
 - **Keep the PRD's middle ground:** tracklists load on demand and stay cached in `catalog.tracks`. A pre-warm job loads the most popular albums (about the top 50k) ahead of time.

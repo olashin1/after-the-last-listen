@@ -2,7 +2,7 @@
 
 Status of each phase in `docs/prd.md` §12. Updated at the end of every task (see CLAUDE.md).
 
-Last updated: 2026-11-21
+Last updated: 2026-11-21 (Phase 3 logging)
 
 ## Phase 1: Foundation + search spike (done)
 
@@ -39,19 +39,25 @@ Done when: a user can reliably find and inspect an album, including new releases
 ## Developer tooling (not a PRD phase)
 
 - [x] Debug search page `/search` behind `DEBUG_TOOLS=true`: results with covers, type and score, linking to album pages
-- [x] Seeded local test accounts on every reset: `alice@demo.test` (public) and `bob@demo.test` (private), password `password123` (`supabase/seed.sql`)
+- [x] Seeded local test accounts on every reset: `alice@demo.test` (public) and `bob@demo.test` (private), password `password123`, plus `test@gmail.com` (username `tester`, public) for manual testing (`supabase/seed.sql`, `docs/testing.md`)
 - [x] Migration workflow: `migration up` while developing; `db:reset` + `pnpm check` before committing or merging (CLAUDE.md)
 - [x] Catalog snapshot and restore (`pnpm catalog:snapshot` / `pnpm catalog:restore`): snapshot 40 s (293 MB), reset 34 s, restore about 6 min, versus about 22 min to re-import; tested 2026-11-21 (albums, canonical releases, credits, loaded tracks, seeded accounts and search all came back)
 
-## Phase 3: Core logging (not started)
+## Phase 3: Core logging (in progress: everything but merges done 2026-11-21)
 
-Done when: one action saves both the collection record and the diary date; the Shooting Star shows on the album page and in the diary.
+Done when: one action saves both the collection record and the diary date; the Shooting Star shows on the album page and in the diary. **Met** for logging and display; the merge follow-up below is what's left. Plan and decisions in `docs/decisions.md` (Phase 3 plan; Logging UI and My Albums).
 
-- [ ] `log_album` function
-- [ ] Logging works when an album's tracklist isn't loaded; the Shooting Star can be added later (see `docs/decisions.md`, tracklist storage)
-- [ ] Rating, review, Shooting Star
-- [ ] First listen
-- [ ] Shooting Star display
+- [x] Schema: `user_albums` and `listens` (with `user_id` and a request ID), RLS via `can_view_user_content()`, diary index (migration `20261121200000_user_albums_listens.sql`, tests `030_user_albums_listens.test.sql`)
+- [x] `log_album` function: upsert the collection record and insert the listen in one transaction; date, rating, review and Shooting Star validation; double-tap safe (migration `20261121210000_logging.sql`)
+- [x] Logging works when an album's tracklist isn't loaded; the Shooting Star can be added later (see `docs/decisions.md`, tracklist storage)
+- [x] `update_user_album`: edit rating, review, Shooting Star
+- [x] Read functions `get_user_album`, `get_collection` and `get_diary`
+- [ ] Merges: move `user_albums` from a merged album to its survivor in `apply_album_redirect()` (most recently edited entry wins)
+- [x] Log dialog: purple "Log +" in the header (search, then log), and a Log button on the album page that opens on that album; re-logging is prefilled and adds a listen
+- [x] Album page: "Your log" (rating, review, Shooting Star, listens) with Edit and Log again; Shooting Star highlighted in the tracklist
+- [x] My Albums `/u/[username]/albums` (cover grid, "No logs yet" empty state) and a basic diary `/u/[username]/diary`, both with Shooting Star display; header "My Albums" link
+- [x] Checked in the browser 2026-11-21 (test@gmail.com): empty state, search and log with rating, review and star, a double-click saving one listen, re-log from the album page (two diary rows, one album), private albums hidden when signed out
+- [x] Tests: pgTAP `030`–`035` including cross-user checks; Vitest for rating and date helpers. Verified from a clean `pnpm db:reset` + `pnpm check` on 2026-11-21 (23 SQL test files, all passing)
 
 ## Phase 4: Diary (not started)
 
@@ -66,7 +72,7 @@ Done when: a repeat album appears several times in the diary but once in the col
 ## Before launch (carried from earlier phases)
 
 - [ ] Turn on the weekly sync: set `CATALOG_DATABASE_URL` (session pooler) once the hosted project exists, then run it once by hand from the Actions tab
-- [ ] Phase 3: move `user_albums` and favorites from a merged album to its survivor in `apply_album_redirect()` (see `docs/decisions.md`)
+- [ ] Phase 5: move favorites from a merged album to its survivor in `apply_album_redirect()` (`user_albums` move in Phase 3; see `docs/decisions.md`)
 - [ ] MusicBrainz and Cover Art Archive attribution site-wide, and confirm the Cover Art Archive terms (see `docs/decisions.md`)
 - [ ] MusicBrainz adapter: shared rate limit across server instances before deploying (see `docs/decisions.md`, 2026-11-21)
 - [ ] Avatar cleanup job for orphaned files; switch avatars to `next/image` with `remotePatterns` (see `docs/decisions.md`, 2026-11-20)

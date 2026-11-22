@@ -52,8 +52,19 @@ pnpm catalog:restore
 |---|---|---|---|
 | `alice@demo.test` | `password123` | `demo_alice` | public |
 | `bob@demo.test` | `password123` | `demo_bob` | private |
+| `test@gmail.com` | `1234` | `tester` | public (your own account for manual testing; the password is under the 8-character minimum, so it only works because it's seeded) |
 
 Local only: they're never created on hosted Supabase.
+
+## Logging (manual check)
+
+Sign in as `test@gmail.com` (or a demo account) with `pnpm dev` running:
+
+1. `/albums` shows "No logs yet" for a new account.
+2. Click the purple **Log +** in the header, search, pick an album, set a rating, a review and a Shooting Star, and save. The album appears in My Albums, the diary and on its page, with the star highlighted in the tracklist.
+3. On that album page, **Log again +** opens the form prefilled. Change the date and save: the diary gets a second row, and My Albums still shows the album once.
+4. **Edit** changes rating, review or star without adding a diary row.
+5. Signed out, `/u/demo_bob/albums` says the profile is private.
 
 ## Search accuracy (real catalog data)
 
