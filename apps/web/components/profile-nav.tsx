@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Avatar } from "@/components/avatar";
 import { getCurrentProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -16,6 +17,18 @@ export async function loadProfilePage(username: string) {
   if (!profile) return null;
   const isOwner = me?.user_id === profile.user_id;
   return { profile, isOwner, contentHidden: profile.visibility === "private" && !isOwner };
+}
+
+/** A user page's heading with their profile picture, e.g. "My Albums" or "Tester's diary". */
+export function ProfileHeading({ title, username, name, avatarPath }: { title: string; username: string; name: string; avatarPath: string | null }) {
+  return (
+    <div className="flex items-center gap-3">
+      <Link href={`/u/${username}`} aria-label={`@${username}'s profile`} className="shrink-0 rounded-full">
+        <Avatar path={avatarPath} name={name} size={48} />
+      </Link>
+      <h1 className="min-w-0 text-2xl font-semibold tracking-tight break-words">{title}</h1>
+    </div>
+  );
 }
 
 const TABS = [

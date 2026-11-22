@@ -259,13 +259,13 @@ isOneToOne: false
             }[]
                            },
 "get_collection":
-{ Args: { "p_before_id"?: number,"p_before_listened"?: string,"p_lim"?: number,"p_username": string }; Returns: {
-              "album_id": number,"artist_credit": string,"first_release_date": string,"last_listened_on": string,"listen_count": number,"mbid": string,"rating": number,"shooting_star_title": string,"title": string,"user_album_id": number
+{ Args: { "p_before_id"?: number,"p_before_listened"?: string,"p_lim"?: number,"p_reviewed_only"?: boolean,"p_username": string }; Returns: {
+              "album_id": number,"artist_credit": string,"first_release_date": string,"last_listened_on": string,"listen_count": number,"mbid": string,"rating": number,"review": string,"shooting_star_title": string,"title": string,"user_album_id": number
             }[]
                            },
 "get_diary":
 { Args: { "p_before_created"?: string,"p_before_id"?: number,"p_before_listened"?: string,"p_lim"?: number,"p_username": string }; Returns: {
-              "album_id": number,"artist_credit": string,"created_at": string,"first_release_date": string,"listen_id": number,"listened_on": string,"mbid": string,"note": string,"rating": number,"shooting_star_title": string,"title": string
+              "album_id": number,"artist_credit": string,"created_at": string,"first_release_date": string,"listen_id": number,"listened_on": string,"mbid": string,"note": string,"rating": number,"review": string,"shooting_star_title": string,"title": string
             }[]
                            },
 "get_user_album":

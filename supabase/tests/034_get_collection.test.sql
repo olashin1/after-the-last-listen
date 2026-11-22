@@ -1,7 +1,7 @@
 -- get_collection(): a user's albums (My Albums), one row per album, most recently listened first.
 -- Fixtures use invented names and fake MBIDs so the tests pass on an empty or a full catalog.
 begin;
-select plan(10);
+select plan(15);
 
 insert into auth.users (id, email, raw_user_meta_data) values
   ('00000000-0000-0000-0000-00000000000a', 'alice@example.com', '{"username": "alice"}'),
@@ -35,6 +35,12 @@ where ua.user_id = '00000000-0000-0000-0000-00000000000a';
 insert into public.listens (user_album_id, user_id, listened_on)
 select id, user_id, '2026-11-02' from public.user_albums where user_id = '00000000-0000-0000-0000-00000000000b';
 
+-- Reviews: Alice reviewed Ashen Mile and Cinder Loft (not Brine Choir); Bob's private review.
+update public.user_albums ua set review = 'Review of ' || a.title
+from catalog.albums a
+where a.id = ua.album_id and a.title in ('Ashen Mile', 'Cinder Loft') and ua.user_id = '00000000-0000-0000-0000-00000000000a';
+update public.user_albums set review = 'Bob secret' where user_id = '00000000-0000-0000-0000-00000000000b';
+
 set local role anon;
 select set_config('request.jwt.claims', '', true);
 select results_eq(
@@ -48,6 +54,21 @@ select results_eq(
   'rows carry rating, Shooting Star, listen count and last listen; username is case-insensitive'
 );
 select is((select count(*)::int from public.get_collection('bob')), 0, 'anon cannot read a private user''s albums');
+select results_eq(
+  $$select title, review from public.get_collection('alice')$$,
+  $$values ('Brine Choir'::text, null::text), ('Ashen Mile'::text, 'Review of Ashen Mile'::text), ('Cinder Loft'::text, 'Review of Cinder Loft'::text)$$,
+  'rows carry the album''s review'
+);
+select results_eq(
+  $$select title from public.get_collection('alice', null, null, 48, true)$$,
+  $$values ('Ashen Mile'::text), ('Cinder Loft'::text)$$,
+  'p_reviewed_only returns only reviewed albums, most recently listened first'
+);
+select results_eq(
+  $$select title from public.get_collection('alice', null, null, 1, true)$$,
+  $$values ('Ashen Mile'::text)$$,
+  'p_reviewed_only respects lim'
+);
 select is((select count(*)::int from public.get_collection('nobody_here')), 0, 'an unknown username returns nothing');
 
 -- Keyset pagination.
@@ -68,10 +89,12 @@ select is((select count(*)::int from public.get_collection('alice', null, null, 
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub": "00000000-0000-0000-0000-00000000000a", "role": "authenticated"}', true);
 select is((select count(*)::int from public.get_collection('bob')), 0, 'a user cannot read another user''s private albums');
+select is((select count(*)::int from public.get_collection('bob', null, null, 48, true)), 0, 'a user cannot read another user''s private reviews');
 
 -- Signed in as Bob.
 select set_config('request.jwt.claims', '{"sub": "00000000-0000-0000-0000-00000000000b", "role": "authenticated"}', true);
 select is((select count(*)::int from public.get_collection('bob')), 1, 'a private user reads their own albums');
+select is((select review from public.get_collection('bob', null, null, 48, true)), 'Bob secret', 'a private user reads their own reviews');
 select is((select count(*)::int from public.get_collection('alice')), 3, 'and can read a public user''s albums');
 
 select * from finish();

@@ -2,6 +2,23 @@
 
 Open and settled decisions that aren't in `docs/prd.md`. Newest first.
 
+## 2026-11-22: Profile pictures on user pages, reviews in the diary (decided with the user)
+
+- **A user's Albums and Diary pages show their profile picture** next to the heading (`ProfileHeading` in `components/profile-nav.tsx`). It links to the profile and uses the letter placeholder when there's no upload. The profile page already had one.
+- **Diary rows show the album's review**, under the artist and above the Shooting Star. A review belongs to the album, not to one listen, so `get_diary()` returns it **only on that album's most recent listen**. Older rows of a re-logged album stay as they were, so the text isn't repeated (migration `20261122090000_diary_review.sql`). Rows without a review are unchanged.
+- **The profile page has two sections under the card:**
+  - **Recently listened:** the 3 most recently listened albums as cover tiles, sharing `AlbumTile` with My Albums.
+  - **Recent reviews:** the 3 most recently listened albums that have a review, as cards with cover, title, artist, rating, the review (clamped to 4 lines) and the Shooting Star.
+  - Both come from `get_collection()`, which now also returns `review` and takes `p_reviewed_only` (migration `20261122100000_collection_reviews.sql`), so RLS still hides them on private profiles.
+  - With no logs, the owner sees "No logs yet" with a Log button; others see that the user hasn't logged anything. The review section is hidden when there are no reviews.
+- **The diary is about 1.5× bigger:**
+  - covers 72 px (was 48)
+  - album titles `text-lg`
+  - artist, date, review and Shooting Star at regular text size instead of small
+  - stars 26 px
+  - a wider column (`max-w-3xl`)
+- **Branch:** `feat/profile-pages`, stacked on `feat/design-purple` (PR #8).
+
 ## 2026-11-21: Purple colour scheme and rounded stars (decided with the user)
 
 - **Soft purples, light and dark,** following the system setting. The palettes are Tailwind v4 `@theme` tokens in `apps/web/app/globals.css`:
